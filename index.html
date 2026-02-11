@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meal Recommendation App</title>
+<style>
+  body { font-family: Arial, sans-serif; text-align: center; padding: 40px; }
+  button, select { padding: 10px 15px; margin: 10px; font-size: 16px; }
+  #result { margin-top: 20px; font-size: 18px; }
+  #steps { margin-top: 15px; text-align: left; display: inline-block; }
+</style>
+</head>
+<body>
+
+<h1>What Should I Eat?</h1>
+
+<label for="mealType">Choose a meal:</label>
+<select id="mealType">
+  <option value="breakfast">Breakfast</option>
+  <option value="lunch">Lunch</option>
+  <option value="dinner">Dinner</option>
+</select>
+
+<br>
+<button onclick="recommendMeal()">Get Recommendation</button>
+<button onclick="recommendMeal()">I don't like it, show another</button>
+<button onclick="showSteps()">I like it! Show steps</button>
+
+<div id="result"></div>
+<ul id="steps"></ul>
+
+<script>
+const meals = {
+  breakfast: [
+    { name: "Omelette", steps: ["Crack eggs into a bowl.", "Whisk with salt.", "Cook in a pan for 3-4 minutes."] },
+    { name: "Pancakes", steps: ["Mix flour, milk, and eggs.", "Pour batter into a pan.", "Flip when bubbles appear."] },
+    { name: "Fruit Yogurt Bowl", steps: ["Add yogurt to a bowl.", "Slice fruits.", "Mix and serve."] }
+  ],
+  lunch: [
+    { name: "Chicken Sandwich", steps: ["Cook chicken breast.", "Place in bread with vegetables.", "Add sauce and serve."] },
+    { name: "Pasta", steps: ["Boil pasta.", "Heat tomato sauce.", "Mix and serve."] },
+    { name: "Salad", steps: ["Chop vegetables.", "Add dressing.", "Mix well."] }
+  ],
+  dinner: [
+    { name: "Grilled Fish", steps: ["Season fish.", "Grill for 10 minutes.", "Serve with lemon."] },
+    { name: "Rice and Vegetables", steps: ["Cook rice.", "Stir-fry vegetables.", "Serve together."] },
+    { name: "Beef Stir Fry", steps: ["Slice beef thinly.", "Cook with vegetables.", "Add soy sauce and serve."] }
+  ]
+};
+
+let currentMeal = null;
+
+function recommendMeal() {
+  const type = document.getElementById('mealType').value;
+  const options = meals[type];
+  currentMeal = options[Math.floor(Math.random() * options.length)];
+  document.getElementById('result').innerText = "Try: " + currentMeal.name;
+  document.getElementById('steps').innerHTML = "";
+}
+
+function showSteps() {
+  if (!currentMeal) return;
+  const stepsList = document.getElementById('steps');
+  stepsList.innerHTML = "";
+  currentMeal.steps.forEach(step => {
+    const li = document.createElement('li');
+    li.innerText = step;
+    stepsList.appendChild(li);
+  });
+}
+</script>
+
+</body>
+</html>
