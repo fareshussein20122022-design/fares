@@ -3,73 +3,121 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Meal Recommendation App</title>
+<title>Smart Meal Recommender</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
 <style>
-  body { font-family: Arial, sans-serif; text-align: center; padding: 40px; }
-  button, select { padding: 10px 15px; margin: 10px; font-size: 16px; }
-  #result { margin-top: 20px; font-size: 18px; }
-  #steps { margin-top: 15px; text-align: left; display: inline-block; }
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(120deg,#f6f9fc,#e9f1ff);
+    text-align: center;
+    padding: 40px;
+  }
+  h1 { font-weight: 700; }
+  .card {
+    background: white;
+    max-width: 500px;
+    margin: auto;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  }
+  select, button {
+    padding: 12px 18px;
+    margin: 10px;
+    border-radius: 10px;
+    border: none;
+    font-size: 16px;
+  }
+  button {
+    background: #4f7cff;
+    color: white;
+    cursor: pointer;
+  }
+  img {
+    width: 100%;
+    border-radius: 15px;
+    margin-top: 15px;
+  }
+  ul { text-align: left; margin-top: 15px; }
 </style>
 </head>
 <body>
 
-<h1>What Should I Eat?</h1>
+<h1>AI Meal Recommendation</h1>
 
-<label for="mealType">Choose a meal:</label>
+<div class="card">
+<label>Select Meal:</label>
 <select id="mealType">
-  <option value="breakfast">Breakfast</option>
-  <option value="lunch">Lunch</option>
-  <option value="dinner">Dinner</option>
+<option value="breakfast">Breakfast</option>
+<option value="lunch">Lunch</option>
+<option value="dinner">Dinner</option>
+<option value="diet">Diet / Healthy</option>
 </select>
 
 <br>
-<button onclick="recommendMeal()">Get Recommendation</button>
-<button onclick="recommendMeal()">I don't like it, show another</button>
-<button onclick="showSteps()">I like it! Show steps</button>
+<button onclick="recommendMeal()">Recommend Meal</button>
+<button onclick="recommendMeal()">Another One</button>
+<button onclick="generateSteps()">Show AI Cooking Steps</button>
 
-<div id="result"></div>
+<h2 id="mealName"></h2>
+<img id="mealImage" />
 <ul id="steps"></ul>
+</div>
 
 <script>
 const meals = {
   breakfast: [
-    { name: "Omelette", steps: ["Crack eggs into a bowl.", "Whisk with salt.", "Cook in a pan for 3-4 minutes."] },
-    { name: "Pancakes", steps: ["Mix flour, milk, and eggs.", "Pour batter into a pan.", "Flip when bubbles appear."] },
-    { name: "Fruit Yogurt Bowl", steps: ["Add yogurt to a bowl.", "Slice fruits.", "Mix and serve."] }
+    { name: "Pancakes", image: "https://images.unsplash.com/photo-1587735243615-c03f25aaff15" },
+    { name: "Omelette", image: "https://images.unsplash.com/photo-1510693206972-df098062cb71" },
+    { name: "Avocado Toast", image: "https://images.unsplash.com/photo-1603048719539-9ecb7f47b3b0" }
   ],
   lunch: [
-    { name: "Chicken Sandwich", steps: ["Cook chicken breast.", "Place in bread with vegetables.", "Add sauce and serve."] },
-    { name: "Pasta", steps: ["Boil pasta.", "Heat tomato sauce.", "Mix and serve."] },
-    { name: "Salad", steps: ["Chop vegetables.", "Add dressing.", "Mix well."] }
+    { name: "Chicken Sandwich", image: "https://images.unsplash.com/photo-1550547660-d9450f859349" },
+    { name: "Pasta", image: "https://images.unsplash.com/photo-1525755662778-989d0524087e" },
+    { name: "Caesar Salad", image: "https://images.unsplash.com/photo-1550304943-4f24f54ddde9" }
   ],
   dinner: [
-    { name: "Grilled Fish", steps: ["Season fish.", "Grill for 10 minutes.", "Serve with lemon."] },
-    { name: "Rice and Vegetables", steps: ["Cook rice.", "Stir-fry vegetables.", "Serve together."] },
-    { name: "Beef Stir Fry", steps: ["Slice beef thinly.", "Cook with vegetables.", "Add soy sauce and serve."] }
+    { name: "Grilled Salmon", image: "https://images.unsplash.com/photo-1467003909585-2f8a72700288" },
+    { name: "Steak", image: "https://images.unsplash.com/photo-1600891964599-f61ba0e24092" },
+    { name: "Rice with Vegetables", image: "https://images.unsplash.com/photo-1604908177522-402d3f7a03fd" }
+  ],
+  diet: [
+    { name: "Quinoa Salad", image: "https://images.unsplash.com/photo-1505253213348-cd54c1f9d3a1" },
+    { name: "Grilled Chicken with Vegetables", image: "https://images.unsplash.com/photo-1604908177094-bb6c28f9b3c1" },
+    { name: "Greek Yogurt Fruit Bowl", image: "https://images.unsplash.com/photo-1488477181946-6428a0291777" },
+    { name: "Oatmeal with Nuts", image: "https://images.unsplash.com/photo-1512058564366-18510be2db19" }
   ]
 };
 
 let currentMeal = null;
 
-function recommendMeal() {
+function recommendMeal(){
   const type = document.getElementById('mealType').value;
   const options = meals[type];
-  currentMeal = options[Math.floor(Math.random() * options.length)];
-  document.getElementById('result').innerText = "Try: " + currentMeal.name;
-  document.getElementById('steps').innerHTML = "";
+  currentMeal = options[Math.floor(Math.random()*options.length)];
+  document.getElementById('mealName').innerText = currentMeal.name;
+  document.getElementById('mealImage').src = currentMeal.image;
+  document.getElementById('steps').innerHTML = '';
 }
 
-function showSteps() {
-  if (!currentMeal) return;
-  const stepsList = document.getElementById('steps');
-  stepsList.innerHTML = "";
-  currentMeal.steps.forEach(step => {
-    const li = document.createElement('li');
-    li.innerText = step;
-    stepsList.appendChild(li);
+function generateSteps(){
+  if(!currentMeal) return;
+  const stepsAI = [
+    "Prepare the ingredients for " + currentMeal.name,
+    "Cook using healthy methods like grilling, baking, or steaming",
+    "Add light seasoning and avoid excess oil",
+    "Serve fresh and enjoy your healthy meal"
+  ];
+  const list = document.getElementById('steps');
+  list.innerHTML='';
+  stepsAI.forEach(step=>{
+    const li=document.createElement('li');
+    li.innerText=step;
+    list.appendChild(li);
   });
 }
 </script>
 
 </body>
 </html>
+
