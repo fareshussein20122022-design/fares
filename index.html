@@ -7,33 +7,71 @@
 <link rel="manifest" href="manifest.json">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
 <style>
-body{font-family:'Poppins',sans-serif;background:linear-gradient(120deg,#f6f9fc,#e9f1ff);text-align:center;padding:40px}
-.card{background:white;max-width:520px;margin:auto;padding:25px;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,0.1)}
-button{padding:12px 18px;margin:10px;border-radius:10px;border:none;font-size:16px;background:#4f7cff;color:white;cursor:pointer}
-img{width:100%;border-radius:15px;margin-top:15px}
-ul{text-align:left;margin-top:15px}
-p{font-weight:500;margin-top:5px}
+body {font-family:'Poppins',sans-serif;text-align:center;padding:40px;transition:background 0.3s,color 0.3s;}
+body.light-mode {background:linear-gradient(120deg,#f6f9fc,#e9f1ff);color:#333;}
+body.dark-mode {background:linear-gradient(120deg,#1e1e1e,#3a3a3a);color:#eee;}
+.card {background:white;max-width:520px;margin:auto;padding:25px;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,0.1);transition:background 0.3s,color 0.3s;}
+body.dark-mode .card {background:#2c2c2c;color:#eee;}
+button {padding:12px 18px;margin:10px;border-radius:10px;border:none;font-size:16px;background:#4f7cff;color:white;cursor:pointer;}
+img {width:100%;border-radius:15px;margin-top:15px;}
+ul {text-align:left;margin-top:15px;}
+p {font-weight:500;margin-top:5px;}
+input, select {padding:8px;margin:5px;border-radius:8px;border:1px solid #ccc;}
+table {width:100%;border-collapse:collapse;margin-top:15px;}
+td, th {border:1px solid #ccc;padding:8px;text-align:center;}
 </style>
 </head>
-<body>
+<body class="light-mode">
 
 <h1>Smart Meal Recommender Pro</h1>
 
 <div class="card">
-
-<!-- Auth buttons -->
+<!-- Auth -->
 <div id="authButtons">
   <button onclick="signInGoogle()">Login with Google</button>
   <button onclick="signOutUser()">Logout</button>
 </div>
 
+<!-- Theme -->
+<button onclick="toggleTheme()">Toggle Light/Dark Mode</button>
+
+<!-- Profile -->
+<h3>User Profile</h3>
+<label>Age: <input type="number" id="age" min="1" max="120"></label>
+<label>Weight (kg): <input type="number" id="weight" min="1" max="300"></label>
+<label>Activity Level:
+  <select id="activity">
+    <option value="low">Low</option>
+    <option value="medium">Medium</option>
+    <option value="high">High</option>
+  </select>
+</label>
+<label>Diet Goal:
+  <select id="dietGoal">
+    <option value="maintain">Maintain Weight</option>
+    <option value="lose">Lose Weight</option>
+    <option value="gain">Gain Weight</option>
+  </select>
+</label>
+<label>Dietary Restrictions:
+  <select id="restriction">
+    <option value="none">None</option>
+    <option value="vegetarian">Vegetarian</option>
+    <option value="vegan">Vegan</option>
+    <option value="gluten-free">Gluten-Free</option>
+  </select>
+</label>
+<button onclick="saveProfile()">Save Profile</button>
+
+<hr>
+
+<!-- Meal Recommendation -->
 <select id="mealType">
 <option value="breakfast">Breakfast</option>
 <option value="lunch">Lunch</option>
 <option value="dinner">Dinner</option>
 <option value="diet">Diet</option>
 </select>
-
 <br>
 <button onclick="recommendMeal()">Recommend Meal</button>
 <button onclick="generateSteps()">AI Cooking Steps</button>
@@ -47,9 +85,24 @@ p{font-weight:500;margin-top:5px}
 
 <h3>Your Favorites</h3>
 <ul id="favorites"></ul>
+
+<hr>
+
+<!-- Weekly Planner -->
+<h3>Weekly Meal Planner</h3>
+<table id="planner">
+<tr><th>Day</th><th>Meal</th></tr>
+<tr><td>Monday</td><td><select id="monday"></select></td></tr>
+<tr><td>Tuesday</td><td><select id="tuesday"></select></td></tr>
+<tr><td>Wednesday</td><td><select id="wednesday"></select></td></tr>
+<tr><td>Thursday</td><td><select id="thursday"></select></td></tr>
+<tr><td>Friday</td><td><select id="friday"></select></td></tr>
+<tr><td>Saturday</td><td><select id="saturday"></select></td></tr>
+<tr><td>Sunday</td><td><select id="sunday"></select></td></tr>
+</table>
+<button onclick="savePlanner()">Save Planner</button>
 </div>
 
-<!-- Firebase & Stripe SDKs -->
 <script src="https://www.gstatic.com/firebasejs/10.1.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.1.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore-compat.js"></script>
@@ -57,7 +110,7 @@ p{font-weight:500;margin-top:5px}
 <script src="https://js.stripe.com/v3/"></script>
 
 <script>
-// ------------------ Firebase Config ------------------
+// ---------------- Firebase ----------------
 const firebaseConfig = {
   apiKey: "YOUR_API_KEY",
   authDomain: "YOUR_PROJECT.firebaseapp.com",
@@ -67,173 +120,173 @@ const firebaseConfig = {
   appId: "YOUR_APP_ID"
 };
 firebase.initializeApp(firebaseConfig);
-
 const auth = firebase.auth();
 const db = firebase.firestore();
 const functions = firebase.functions();
 const stripe = Stripe("YOUR_STRIPE_PUBLIC_KEY");
 
-// ------------------ Meals Data ------------------
+// ---------------- Meals ----------------
 const meals = {
 breakfast:[
-{name:"Pancakes",image:"https://eggs.ca/wp-content/uploads/2024/06/fluffy-pancakes-1664x832-1.jpg", calories:350},
-{name:"Omelette",image:"https://images.unsplash.com/photo-1510693206972-df098062cb71", calories:250},
-{name:"French Toast",image:"https://images.unsplash.com/photo-1484723091739-30a097e8f929", calories:300},
-{name:"Bagel with Cream Cheese",image:"https://images.unsplash.com/photo-1509440159596-0249088772ff", calories:400},
-{name:"Fruit Smoothie",image:"https://images.unsplash.com/photo-1497534446932-c925b458314e", calories:200},
-{name:"Breakfast Burrito",image:"https://images.unsplash.com/photo-1600891964599-f61ba0e24092", calories:450},
-{name:"Granola Bowl",image:"https://images.unsplash.com/photo-1512621776951-a57141f2eefd", calories:350},
-{name:"Croissant",image:"https://images.unsplash.com/photo-1509440159596-0249088772ff", calories:300},
-{name:"Waffles",image:"https://images.unsplash.com/photo-1506084868230-bb9d95c24759", calories:400},
-{name:"Egg Muffins",image:"https://images.unsplash.com/photo-1495195134817-aeb325a55b65", calories:250}
+{name:"Pancakes",image:"https://eggs.ca/wp-content/uploads/2024/06/fluffy-pancakes-1664x832-1.jpg", calories:350, type:"none"},
+{name:"Omelette",image:"https://images.unsplash.com/photo-1510693206972-df098062cb71", calories:250, type:"vegetarian"},
+{name:"French Toast",image:"https://images.unsplash.com/photo-1484723091739-30a097e8f929", calories:300, type:"vegetarian"}
 ],
 lunch:[
-{name:"Chicken Sandwich",image:"https://seasonedskilletblog.com/wp-content/uploads/2022/08/spicy-crispy-chicken-sandwich-07.jpg", calories:450},
-{name:"Burger",image:"https://images.unsplash.com/photo-1550547660-d9450f859349", calories:600},
-{name:"Sushi",image:"https://images.unsplash.com/photo-1553621042-f6e147245754", calories:300},
-{name:"Wrap",image:"https://images.unsplash.com/photo-1565299624946-b28f40a0ae38", calories:350},
-{name:"Fried Rice",image:"https://images.unsplash.com/photo-1604908177522-040f6d5db5f6", calories:500},
-{name:"Pizza Slice",image:"https://images.unsplash.com/photo-1548365328-8b849e8d2b4c", calories:400},
-{name:"Chicken Salad",image:"https://images.unsplash.com/photo-1550304943-4f24f54ddde9", calories:320},
-{name:"Tacos",image:"https://images.unsplash.com/photo-1551504734-5ee1c4a1479b", calories:450},
-{name:"Noodles",image:"https://images.unsplash.com/photo-1585032226651-759b368d7246", calories:380},
-{name:"Falafel Wrap",image:"https://images.unsplash.com/photo-1546069901-eacef0df6022", calories:350}
+{name:"Chicken Sandwich",image:"https://seasonedskilletblog.com/wp-content/uploads/2022/08/spicy-crispy-chicken-sandwich-07.jpg", calories:450, type:"none"},
+{name:"Burger",image:"https://images.unsplash.com/photo-1550547660-d9450f859349", calories:600, type:"none"},
+{name:"Sushi",image:"https://images.unsplash.com/photo-1553621042-f6e147245754", calories:300, type:"none"}
 ],
 dinner:[
-{name:"Steak",image:"https://www.allrecipes.com/thmb/OJ28fIFte6Pyg93ML8IM-APbu1Y=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/AR-14554-sirloin-steak-with-garlic-butter-hero-4x3-d12fa79836754fcf850388e4677bbf55.jpg", calories:700},
-{name:"Grilled Chicken",image:"https://images.unsplash.com/photo-1600891964092-4316c288032e", calories:500},
-{name:"Salmon",image:"https://images.unsplash.com/photo-1467003909585-2f8a72700288", calories:450},
-{name:"Pasta Alfredo",image:"https://images.unsplash.com/photo-1525755662778-989d0524087e", calories:650},
-{name:"BBQ Ribs",image:"https://images.unsplash.com/photo-1555939594-58d7cb561ad1", calories:750},
-{name:"Roasted Vegetables",image:"https://images.unsplash.com/photo-1512621776951-a57141f2eefd", calories:300},
-{name:"Curry",image:"https://images.unsplash.com/photo-1605478033166-4f02c3d01c9b", calories:500},
-{name:"Lasagna",image:"https://images.unsplash.com/photo-1603133872878-684f208fb84b", calories:600},
-{name:"Stuffed Peppers",image:"https://images.unsplash.com/photo-1604908177522-040f6d5db5f6", calories:400},
-{name:"Chicken Biryani",image:"https://images.unsplash.com/photo-1604908177522-040f6d5db5f6", calories:650}
+{name:"Steak",image:"https://www.allrecipes.com/thmb/OJ28fIFte6Pyg93ML8IM-APbu1Y=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/AR-14554-sirloin-steak-with-garlic-butter-hero-4x3-d12fa79836754fcf850388e4677bbf55.jpg", calories:700, type:"none"},
+{name:"Grilled Chicken",image:"https://images.unsplash.com/photo-1600891964092-4316c288032e", calories:500, type:"none"},
+{name:"Salmon",image:"https://images.unsplash.com/photo-1467003909585-2f8a72700288", calories:450, type:"none"}
 ],
 diet:[
-{name:"Quinoa Salad",image:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDkgWQfaBu9Fp8WzllAzodvVYQi5mScx2maQ&s", calories:320},
-{name:"Greek Yogurt Bowl",image:"https://images.unsplash.com/photo-1488477181946-6428a0291777", calories:250},
-{name:"Oatmeal",image:"https://images.unsplash.com/photo-1517677208171-0bc6725a3e60", calories:200},
-{name:"Grilled Fish",image:"https://images.unsplash.com/photo-1467003909585-2f8a72700288", calories:350},
-{name:"Vegetable Soup",image:"https://images.unsplash.com/photo-1543353071-10c8ba85a904", calories:180},
-{name:"Fruit Salad",image:"https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea", calories:150},
-{name:"Chicken & Veg Bowl",image:"https://images.unsplash.com/photo-1600891964092-4316c288032e", calories:400},
-{name:"Lentil Salad",image:"https://images.unsplash.com/photo-1546069901-eacef0df6022", calories:300},
-{name:"Zucchini Noodles",image:"https://images.unsplash.com/photo-1525755662778-989d0524087e", calories:250},
-{name:"Tofu Stir Fry",image:"https://images.unsplash.com/photo-1512621776951-a57141f2eefd", calories:350}
+{name:"Quinoa Salad",image:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDkgWQfaBu9Fp8WzllAzodvVYQi5mScx2maQ&s", calories:320, type:"vegan"},
+{name:"Greek Yogurt Bowl",image:"https://images.unsplash.com/photo-1488477181946-6428a0291777", calories:250, type:"vegetarian"},
+{name:"Oatmeal",image:"https://images.unsplash.com/photo-1517677208171-0bc6725a3e60", calories:200, type:"vegetarian"}
 ]
 };
 
-// ------------------ Current Meal ------------------
+// ---------------- Current Meal ----------------
 let currentMeal = null;
 
-// ------------------ Meal Recommendation ------------------
+// ---------------- Profile ----------------
+function saveProfile(){
+  const age = document.getElementById("age").value;
+  const weight = document.getElementById("weight").value;
+  const activity = document.getElementById("activity").value;
+  const dietGoal = document.getElementById("dietGoal").value;
+  const restriction = document.getElementById("restriction").value;
+  const user = auth.currentUser;
+  if(!user) return alert("Login required");
+  db.collection("users").doc(user.uid).set({age, weight, activity, dietGoal, restriction},{merge:true});
+  alert("Profile saved!");
+}
+
+// ---------------- Meal Recommendation ----------------
 function recommendMeal(){
   const type = document.getElementById('mealType').value;
   const options = meals[type];
-  currentMeal = options[Math.floor(Math.random() * options.length)];
-  document.getElementById('mealName').innerText = currentMeal.name;
-  document.getElementById('mealCalories').innerText = `Calories: ${currentMeal.calories}`;
-  document.getElementById('mealImage').src = currentMeal.image;
-  document.getElementById('steps').innerHTML = '';
+  const user = auth.currentUser;
+  let restriction = "none";
+  if(user){
+    db.collection("users").doc(user.uid).get().then(doc=>{
+      restriction = doc.data()?.restriction || "none";
+      let filtered = options.filter(m=>restriction==="none" || m.type===restriction);
+      currentMeal = filtered[Math.floor(Math.random() * filtered.length)];
+      showMeal(currentMeal);
+    });
+  } else {
+    currentMeal = options[Math.floor(Math.random() * options.length)];
+    showMeal(currentMeal);
+  }
 }
 
-// ------------------ AI Steps (Very brief) ------------------
-async function generateSteps(){
+function showMeal(meal){
+  document.getElementById("mealName").innerText = meal.name;
+  document.getElementById("mealCalories").innerText = `Calories: ${meal.calories}`;
+  document.getElementById("mealImage").src = meal.image;
+  document.getElementById("steps").innerHTML = '';
+}
+
+// ---------------- AI Steps ----------------
+function generateSteps(){
   if(!currentMeal) return alert("Pick a meal first");
-  if(!auth.currentUser) return alert("Login required");
-
-  const briefSteps = {
-    "Pancakes":["Mix","Cook","Serve"], "Omelette":["Whisk","Cook","Serve"], "French Toast":["Dip","Cook","Serve"],
-    "Bagel with Cream Cheese":["Slice","Spread","Eat"], "Fruit Smoothie":["Blend","Pour","Drink"], "Breakfast Burrito":["Fill","Wrap","Cook"],
-    "Granola Bowl":["Combine","Top","Serve"], "Croissant":["Bake","Cool","Serve"], "Waffles":["Mix","Cook","Serve"], "Egg Muffins":["Whisk","Bake","Serve"],
-
-    "Chicken Sandwich":["Assemble","Grill","Serve"], "Burger":["Assemble","Grill","Serve"], "Sushi":["Roll","Slice","Serve"],
-    "Wrap":["Fill","Roll","Serve"], "Fried Rice":["Cook","Mix","Serve"], "Pizza Slice":["Bake","Slice","Serve"],
-    "Chicken Salad":["Chop","Mix","Serve"], "Tacos":["Fill","Top","Serve"], "Noodles":["Boil","Toss","Serve"], "Falafel Wrap":["Cook","Wrap","Serve"],
-
-    "Steak":["Season","Grill","Serve"], "Grilled Chicken":["Marinate","Grill","Serve"], "Salmon":["Season","Bake","Serve"],
-    "Pasta Alfredo":["Boil","Mix","Serve"], "BBQ Ribs":["Season","Bake","Serve"], "Roasted Vegetables":["Chop","Roast","Serve"],
-    "Curry":["Cook","Simmer","Serve"], "Lasagna":["Layer","Bake","Serve"], "Stuffed Peppers":["Fill","Bake","Serve"], "Chicken Biryani":["Cook","Layer","Serve"],
-
-    "Quinoa Salad":["Cook","Mix","Serve"], "Greek Yogurt Bowl":["Spoon","Top","Serve"], "Oatmeal":["Cook","Top","Serve"],
-    "Grilled Fish":["Season","Grill","Serve"], "Vegetable Soup":["Chop","Cook","Serve"], "Fruit Salad":["Chop","Mix","Serve"],
-    "Chicken & Veg Bowl":["Cook","Mix","Serve"], "Lentil Salad":["Cook","Mix","Serve"], "Zucchini Noodles":["Boil","Toss","Serve"], "Tofu Stir Fry":["Cook","Toss","Serve"]
-  };
-
-  const steps = briefSteps[currentMeal.name] || ["Prep","Cook","Serve"];
+  const briefSteps = ["Prep","Cook","Serve"];
   const list = document.getElementById("steps");
   list.innerHTML = '';
-  steps.forEach(step => {
-    const li = document.createElement('li');
-    li.innerText = step;
+  briefSteps.forEach(s=>{
+    const li = document.createElement("li");
+    li.innerText = s;
     list.appendChild(li);
   });
 }
 
-// ------------------ Favorites ------------------
-async function saveFavorite(){
+// ---------------- Favorites ----------------
+function saveFavorite(){
   if(!currentMeal) return alert("Pick a meal first");
   const user = auth.currentUser;
   if(!user) return alert("Login required");
-
-  const userRef = db.collection("users").doc(user.uid);
-  await userRef.set({
-    favorites: firebase.firestore.FieldValue.arrayUnion(currentMeal),
-    email: user.email,
-    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-  }, {merge:true});
+  db.collection("users").doc(user.uid).set({favorites: firebase.firestore.FieldValue.arrayUnion(currentMeal)},{merge:true});
   loadFavorites();
 }
 
-async function loadFavorites(){
+function loadFavorites(){
   const user = auth.currentUser;
-  const list = document.getElementById('favorites');
+  const list = document.getElementById("favorites");
   list.innerHTML = '';
   if(!user) return;
-
-  const doc = await db.collection("users").doc(user.uid).get();
-  const favs = doc.data()?.favorites || [];
-  favs.forEach(f => {
-    const li = document.createElement('li');
-    li.innerText = `${f.name} - ${f.calories} cal`;
-    list.appendChild(li);
+  db.collection("users").doc(user.uid).get().then(doc=>{
+    const favs = doc.data()?.favorites || [];
+    favs.forEach(f=>{
+      const li = document.createElement("li");
+      li.innerText = `${f.name} - ${f.calories} cal`;
+      list.appendChild(li);
+    });
   });
 }
 
-// ------------------ Authentication ------------------
+// ---------------- Planner ----------------
+function savePlanner(){
+  const user = auth.currentUser;
+  if(!user) return alert("Login required");
+  const planner = {};
+  ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"].forEach(day=>{
+    planner[day] = document.getElementById(day).value;
+  });
+  db.collection("users").doc(user.uid).set({planner},{merge:true});
+  alert("Planner saved!");
+}
+
+// ---------------- Authentication ----------------
 function signInGoogle(){
   const provider = new firebase.auth.GoogleAuthProvider();
-  auth.signInWithPopup(provider);
+  auth.signInWithPopup(provider)
+    .then(res=>{
+      alert(`Welcome ${res.user.displayName}!`);
+      loadFavorites();
+    }).catch(e=>{
+      alert("Login failed: "+e.message);
+    });
 }
-
-function signOutUser(){
-  auth.signOut();
-}
-
-// Monitor auth state
-auth.onAuthStateChanged(user => {
-  if(user){
-    loadFavorites();
-  } else {
-    document.getElementById('favorites').innerHTML = '';
-  }
+function signOutUser(){ auth.signOut().then(()=>alert("Logged out")); }
+auth.onAuthStateChanged(user=>{
+  if(user) loadFavorites();
 });
 
-// ------------------ Stripe Subscription ------------------
+// ---------------- Stripe ----------------
 async function subscribe(){
   if(!auth.currentUser) return alert("Login required");
   const createCheckoutSession = functions.httpsCallable("createCheckoutSession");
   const session = await createCheckoutSession();
-  stripe.redirectToCheckout({ sessionId: session.data.sessionId });
+  stripe.redirectToCheckout({sessionId: session.data.sessionId});
 }
 
-// ------------------ PWA Service Worker ------------------
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('sw.js');
+// ---------------- Theme ----------------
+function toggleTheme(){
+  document.body.classList.toggle("dark-mode");
+  document.body.classList.toggle("light-mode");
 }
 
+// ---------------- Populate Planner Options ----------------
+function populatePlanner(){
+  const allMeals = [].concat(meals.breakfast,meals.lunch,meals.dinner,meals.diet);
+  ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"].forEach(day=>{
+    const select = document.getElementById(day);
+    allMeals.forEach(m=>{
+      const opt = document.createElement("option");
+      opt.value = m.name;
+      opt.innerText = `${m.name} (${m.calories} cal)`;
+      select.appendChild(opt);
+    });
+  });
+}
+populatePlanner();
+
+// ---------------- PWA ----------------
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js');}
 </script>
 </body>
 </html>
