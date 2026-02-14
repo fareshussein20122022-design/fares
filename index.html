@@ -131,7 +131,7 @@ const db = firebase.firestore();
 const functions = firebase.functions();
 const stripe = Stripe("YOUR_STRIPE_PUBLIC_KEY");
 
-// ---------------- Meals (RESTORED FULL LIST) ----------------
+// ---------------- Meals ----------------
 const meals = {
 breakfast:[
 {name:"Pancakes",image:"https://eggs.ca/wp-content/uploads/2024/06/fluffy-pancakes-1664x832-1.jpg", calories:350, type:"none"},
@@ -182,7 +182,133 @@ diet:[
 {name:"Tofu Stir Fry",image:"https://images.unsplash.com/photo-1512621776951-a57141f2eefd", calories:320, type:"vegan"}
 ]
 };
+// ---------------- Current Meal ----------------
+let currentMeal = null;
 
-// ---------------- Rest of the previous JS code ----------------
-// (Email login, profile, favorites, planner, AI steps, Stripe, theme, etc.)
-// … same as previous version …
+// ---------------- Email/Password Auth ----------------
+function registerEmail() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  if(!email || !password) return alert("Enter email and password");
+  auth.createUserWithEmailAndPassword(email,password)
+    .then(u=>{alert(`Account created! Welcome ${u.user.email}`); loadFavorites();})
+    .catch(e=>alert("Registration failed: "+e.message));
+}
+function loginEmail() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  if(!email || !password) return alert("Enter email and password");
+  auth.signInWithEmailAndPassword(email,password)
+    .then(u=>{alert(`Welcome back, ${u.user.email}`); loadFavorites();})
+    .catch(e=>alert("Login failed: "+e.message));
+}
+function logoutUser(){ auth.signOut().then(()=>alert("Logged out")); }
+auth.onAuthStateChanged(user=>{ if(user) loadFavorites(); });
+
+// ---------------- Profile ----------------
+function saveProfile(){
+  const age = document.getElementById("age").value;
+  const weight = document.getElementById("weight").value;
+  const activity = document.getElementById("activity").value;
+  const dietGoal = document.getElementById("dietGoal").value;
+  const restriction = document.getElementById("restriction").value;
+  const user = auth.currentUser;
+  if(!user) return alert("Login required");
+  db.collection("users").doc(user.uid).set({age,weight,activity,dietGoal,restriction},{merge:true});
+  alert("Profile saved!");
+}
+
+// ---------------- Meal Recommendation ----------------
+function recommendMeal(){
+  const type = document.getElementById('mealType').value;
+  const options = meals[type];
+  const user = auth.currentUser;
+  let restriction = "none";
+  if(user){
+    db.collection("users").doc(user.uid).get().then(doc=>{
+      restriction = doc.data()?.restriction || "none";
+      const filtered = options.filter(m=>restriction==="none"||m.type===restriction);
+      currentMeal = filtered[Math.floor(Math.random()*filtered.length)];
+      showMeal(currentMeal);
+    });
+  } else {
+    currentMeal = options[Math.floor(Math.random()*options.length)];
+    showMeal(currentMeal);
+  }
+}
+function showMeal(meal){
+  document.getElementById("mealName").innerText = meal.name;
+  document.getElementById("mealCalories").innerText = `Calories: ${meal.calories}`;
+  document.getElementById("mealImage").src = meal.image;
+  document.getElementById("steps").innerHTML = '';
+}
+
+// ---------------- AI Steps ----------------
+function generateSteps(){
+  if(!currentMeal) return alert("Pick a meal first");
+  const briefSteps=["Prep","Cook","Serve"];
+  const list=document.getElementById("steps");
+  list.innerHTML='';
+  briefSteps.forEach(s=>{const li=document.createElement("li");li.innerText=s;list.appendChild(li);});
+}
+
+// ---------------- Favorites ----------------
+function saveFavorite(){
+  if(!currentMeal) return alert("Pick a meal first");
+  const user = auth.currentUser;
+  if(!user) return alert("Login required");
+  db.collection("users").doc(user.uid).set({favorites: firebase.firestore.FieldValue.arrayUnion(currentMeal)},{merge:true});
+  loadFavorites();
+}
+function loadFavorites(){
+  const user = auth.currentUser;
+  const list = document.getElementById("favorites");
+  list.innerHTML='';
+  if(!user) return;
+  db.collection("users").doc(user.uid).get().then(doc=>{
+    const favs=doc.data()?.favorites||[];
+    favs.forEach(f=>{const li=document.createElement("li");li.innerText=`${f.name} - ${f.calories} cal`;list.appendChild(li);});
+  });
+}
+
+// ---------------- Planner ----------------
+function savePlanner(){
+  const user = auth.currentUser;
+  if(!user) return alert("Login required");
+  const planner={};
+  ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"].forEach(day=>{
+    planner[day]=document.getElementById(day).value;
+  });
+  db.collection("users").doc(user.uid).set({planner},{merge:true});
+  alert("Planner saved!");
+}
+
+// ---------------- Stripe ----------------
+async function subscribe(){
+  if(!auth.currentUser) return alert("Login required");
+  const createCheckoutSession = functions.httpsCallable("createCheckoutSession");
+  const session = await createCheckoutSession();
+  stripe.redirectToCheckout({sessionId: session.data.sessionId});
+}
+
+// ---------------- Theme ----------------
+function toggleTheme(){
+  document.body.classList.toggle("dark-mode");
+  document.body.classList.toggle("light-mode");
+}
+
+// ---------------- Populate Planner ----------------
+function populatePlanner(){
+  const allMeals=[].concat(meals.breakfast,meals.lunch,meals.dinner,meals.diet);
+  ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"].forEach(day=>{
+    const select=document.getElementById(day);
+    allMeals.forEach(m=>{const opt=document.createElement("option");opt.value=m.name;opt.innerText=`${m.name} (${m.calories} cal)`;select.appendChild(opt);});
+  });
+}
+populatePlanner();
+
+// ---------------- PWA ----------------
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js');}
+</script>
+</body>
+</html>
