@@ -3,50 +3,73 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Smart Meal Recommender</title>
+<title>Ultimate AI Meal App</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
 <style>
   body {
     font-family: 'Poppins', sans-serif;
-    background: linear-gradient(120deg,#f6f9fc,#e9f1ff);
-    text-align: center;
-    padding: 40px;
+    background: linear-gradient(135deg,#dfe9f3,#ffffff);
+    margin:0;
+    padding:20px;
+    text-align:center;
   }
-  h1 { font-weight: 700; }
-  .card {
-    background: white;
-    max-width: 500px;
-    margin: auto;
-    padding: 25px;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  h1 { margin-bottom:10px; }
+  .app {
+    max-width:600px;
+    margin:auto;
+    background:white;
+    padding:20px;
+    border-radius:25px;
+    box-shadow:0 15px 40px rgba(0,0,0,0.15);
   }
-  select, button {
-    padding: 12px 18px;
-    margin: 10px;
-    border-radius: 10px;
-    border: none;
-    font-size: 16px;
+  select, button, input {
+    padding:12px;
+    margin:8px 0;
+    width:100%;
+    border-radius:12px;
+    border:1px solid #ddd;
+    font-size:15px;
   }
   button {
-    background: #4f7cff;
-    color: white;
-    cursor: pointer;
+    background:#4f7cff;
+    color:white;
+    border:none;
+    cursor:pointer;
+    transition:0.3s;
   }
+  button:hover { background:#355ce0; }
   img {
-    width: 100%;
-    border-radius: 15px;
-    margin-top: 15px;
+    width:100%;
+    border-radius:15px;
+    margin-top:10px;
+    max-height:280px;
+    object-fit:cover;
   }
-  ul { text-align: left; margin-top: 15px; }
+  ul { text-align:left; }
+  .badge {
+    background:#eef4ff;
+    padding:6px 12px;
+    border-radius:20px;
+    display:inline-block;
+    margin-top:8px;
+    font-size:14px;
+  }
+  .favorites {
+    margin-top:20px;
+    text-align:left;
+  }
+  .calories {
+    font-weight:bold;
+    margin-top:8px;
+  }
 </style>
 </head>
 <body>
 
-<h1>AI Meal Recommendation</h1>
+<h1>Ultimate AI Meal Recommender</h1>
 
-<div class="card">
-<label>Select Meal:</label>
+<div class="app">
+
 <select id="mealType">
 <option value="breakfast">Breakfast</option>
 <option value="lunch">Lunch</option>
@@ -54,70 +77,107 @@
 <option value="diet">Diet / Healthy</option>
 </select>
 
-<br>
+<input type="text" id="ingredientsInput" placeholder="Enter ingredients you have (e.g. chicken, rice)">
+
 <button onclick="recommendMeal()">Recommend Meal</button>
-<button onclick="recommendMeal()">Another One</button>
-<button onclick="generateSteps()">Show AI Cooking Steps</button>
+<button onclick="generateSteps()">Generate AI Steps</button>
+<button onclick="saveFavorite()">❤️ Save to Favorites</button>
 
 <h2 id="mealName"></h2>
+<div id="mealBadge" class="badge"></div>
+<div id="calories" class="calories"></div>
 <img id="mealImage" />
 <ul id="steps"></ul>
+
+<div class="favorites">
+<h3>⭐ Favorite Meals</h3>
+<ul id="favoriteList"></ul>
+</div>
+
 </div>
 
 <script>
 const meals = {
-  breakfast: [
-    { name: "Pancakes", image: "https://eggs.ca/wp-content/uploads/2024/06/fluffy-pancakes-1664x832-1.jpg" },
-    { name: "Omelette", image: "https://images.unsplash.com/photo-1510693206972-df098062cb71" },
-    { name: "Avocado Toast", image: "https://www.eatingbirdfood.com/wp-content/uploads/2023/12/avocado-toast-hero-cropped.jpg" }
+  breakfast:[
+    {name:"Omelette", image:"https://images.unsplash.com/photo-1510693206972-df098062cb71", type:"High Protein", calories:250},
+    {name:"Avocado Toast", image:"https://images.unsplash.com/photo-1603048719539-9ecb7f47b3b0", type:"Healthy Fats", calories:300}
   ],
-  lunch: [
-    { name: "Chicken Sandwich", image: "https://seasonedskilletblog.com/wp-content/uploads/2022/08/spicy-crispy-chicken-sandwich-07.jpg" },
-    { name: "Pasta", image: "https://www.sharmispassions.com/wp-content/uploads/2015/12/alfredopasta5-500x500.jpg" },
-    { name: "Caesar Salad", image: "https://images.unsplash.com/photo-1550304943-4f24f54ddde9" }
+  lunch:[
+    {name:"Chicken Sandwich", image:"https://images.unsplash.com/photo-1550547660-d9450f859349", type:"Balanced", calories:450},
+    {name:"Pasta", image:"https://images.unsplash.com/photo-1525755662778-989d0524087e", type:"Carb Energy", calories:550}
   ],
-  dinner: [
-    { name: "Grilled Salmon", image: "https://images.unsplash.com/photo-1467003909585-2f8a72700288" },
-    { name: "Steak", image: "https://www.allrecipes.com/thmb/OJ28fIFte6Pyg93ML8IM-APbu1Y=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/AR-14554-sirloin-steak-with-garlic-butter-hero-4x3-d12fa79836754fcf850388e4677bbf55.jpg" },
-    { name: "Rice with Vegetables", image: "https://twokooksinthekitchen.com/wp-content/uploads/2022/06/veggies-and-rice-instant-pot-5.jpg" }
+  dinner:[
+    {name:"Grilled Salmon", image:"https://images.unsplash.com/photo-1467003909585-2f8a72700288", type:"Omega-3", calories:400},
+    {name:"Steak", image:"https://images.unsplash.com/photo-1600891964599-f61ba0e24092", type:"High Protein", calories:600}
   ],
-  diet: [
-    { name: "Quinoa Salad", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDkgWQfaBu9Fp8WzllAzodvVYQi5mScx2maQ&s" },
-    { name: "Grilled Chicken with Vegetables", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTQQNO75nk8MkdiAQeDD8yoC_B3o783GiPSFQ&s" },
-    { name: "Greek Yogurt Fruit Bowl", image: "https://images.unsplash.com/photo-1488477181946-6428a0291777" },
-    { name: "Oatmeal with Nuts", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSizK4RKmZHp1pGzvh9VjZ1N_uvrk5C8h96JA&s" }
+  diet:[
+    {name:"Quinoa Salad", image:"https://images.unsplash.com/photo-1505253213348-cd54c1f9d3a1", type:"Weight Loss", calories:320},
+    {name:"Greek Yogurt Bowl", image:"https://images.unsplash.com/photo-1488477181946-6428a0291777", type:"High Protein", calories:200}
   ]
 };
 
-let currentMeal = null;
+let currentMeal=null;
 
 function recommendMeal(){
-  const type = document.getElementById('mealType').value;
-  const options = meals[type];
-  currentMeal = options[Math.floor(Math.random()*options.length)];
-  document.getElementById('mealName').innerText = currentMeal.name;
-  document.getElementById('mealImage').src = currentMeal.image;
-  document.getElementById('steps').innerHTML = '';
+  const type=document.getElementById('mealType').value;
+  const ingredients=document.getElementById('ingredientsInput').value.toLowerCase();
+  let options=meals[type];
+
+  if(ingredients){
+    options=options.filter(meal=>meal.name.toLowerCase().includes(ingredients));
+    if(options.length===0) options=meals[type];
+  }
+
+  currentMeal=options[Math.floor(Math.random()*options.length)];
+
+  document.getElementById('mealName').innerText=currentMeal.name;
+  document.getElementById('mealImage').src=currentMeal.image;
+  document.getElementById('mealBadge').innerText=currentMeal.type;
+  document.getElementById('calories').innerText="Calories: "+currentMeal.calories+" kcal";
+  document.getElementById('steps').innerHTML="";
 }
 
 function generateSteps(){
   if(!currentMeal) return;
-  const stepsAI = [
-    "Prepare the ingredients for " + currentMeal.name,
-    "Cook using healthy methods like grilling, baking, or steaming",
-    "Add light seasoning and avoid excess oil",
-    "Serve fresh and enjoy your healthy meal"
+
+  const aiSteps=[
+    `Step 1: Prepare fresh ingredients for ${currentMeal.name}.`,
+    "Step 2: Cut and measure everything properly.",
+    "Step 3: Cook using the best technique (grill, bake, or pan-cook).",
+    "Step 4: Season gradually and taste as you cook.",
+    "Step 5: Plate beautifully and enjoy!"
   ];
-  const list = document.getElementById('steps');
-  list.innerHTML='';
-  stepsAI.forEach(step=>{
+
+  const list=document.getElementById('steps');
+  list.innerHTML="";
+  aiSteps.forEach(step=>{
     const li=document.createElement('li');
     li.innerText=step;
     list.appendChild(li);
   });
 }
+
+function saveFavorite(){
+  if(!currentMeal) return;
+  let favorites=JSON.parse(localStorage.getItem('favorites'))||[];
+  favorites.push(currentMeal.name);
+  localStorage.setItem('favorites',JSON.stringify(favorites));
+  displayFavorites();
+}
+
+function displayFavorites(){
+  const list=document.getElementById('favoriteList');
+  list.innerHTML="";
+  let favorites=JSON.parse(localStorage.getItem('favorites'))||[];
+  favorites.forEach(meal=>{
+    const li=document.createElement('li');
+    li.innerText=meal;
+    list.appendChild(li);
+  });
+}
+
+displayFavorites();
 </script>
 
 </body>
 </html>
-
