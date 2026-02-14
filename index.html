@@ -88,10 +88,34 @@ if(localStorage.getItem('user')){
 }
 
 const meals={
-  breakfast:[{name:"Omelette",image:"https://images.unsplash.com/photo-1510693206972-df098062cb71",type:"High Protein",calories:250}],
-  lunch:[{name:"Chicken Sandwich",image:"https://images.unsplash.com/photo-1550547660-d9450f859349",type:"Balanced",calories:450}],
-  dinner:[{name:"Grilled Salmon",image:"https://images.unsplash.com/photo-1467003909585-2f8a72700288",type:"Omega-3",calories:400}],
-  diet:[{name:"Quinoa Salad",image:"https://images.unsplash.com/photo-1505253213348-cd54c1f9d3a1",type:"Weight Loss",calories:320}]
+  breakfast:[
+    {name:"Omelette",image:"https://images.unsplash.com/photo-1510693206972-df098062cb71",type:"High Protein",calories:250},
+    {name:"Avocado Toast",image:"https://images.unsplash.com/photo-1603048719539-9ecb7f47b3b0",type:"Healthy Fats",calories:300},
+    {name:"Pancakes",image:"https://images.unsplash.com/photo-1587735243615-c03f25aaff15",type:"Energy Boost",calories:350},
+    {name:"Fruit Yogurt Bowl",image:"https://images.unsplash.com/photo-1488477181946-6428a0291777",type:"Light Meal",calories:220},
+    {name:"Oatmeal with Honey",image:"https://images.unsplash.com/photo-1512058564366-18510be2db19",type:"Fiber Rich",calories:280}
+  ],
+  lunch:[
+    {name:"Chicken Sandwich",image:"https://images.unsplash.com/photo-1550547660-d9450f859349",type:"Balanced",calories:450},
+    {name:"Pasta",image:"https://images.unsplash.com/photo-1525755662778-989d0524087e",type:"Carb Energy",calories:550},
+    {name:"Caesar Salad",image:"https://images.unsplash.com/photo-1550304943-4f24f54ddde9",type:"Light",calories:320},
+    {name:"Beef Wrap",image:"https://images.unsplash.com/photo-1604908177522-402d3f7a03fd",type:"Protein",calories:480},
+    {name:"Vegetable Stir Fry",image:"https://images.unsplash.com/photo-1546069901-ba9599a7e63c",type:"Healthy",calories:350}
+  ],
+  dinner:[
+    {name:"Grilled Salmon",image:"https://images.unsplash.com/photo-1467003909585-2f8a72700288",type:"Omega-3",calories:400},
+    {name:"Steak",image:"https://images.unsplash.com/photo-1600891964599-f61ba0e24092",type:"High Protein",calories:600},
+    {name:"Rice with Vegetables",image:"https://images.unsplash.com/photo-1604908177522-402d3f7a03fd",type:"Comfort",calories:420},
+    {name:"Chicken Curry",image:"https://images.unsplash.com/photo-1603894584373-5ac82b2ae398",type:"Spicy",calories:520},
+    {name:"Shrimp Pasta",image:"https://images.unsplash.com/photo-1563379091339-03246963d51a",type:"Seafood",calories:510}
+  ],
+  diet:[
+    {name:"Quinoa Salad",image:"https://images.unsplash.com/photo-1505253213348-cd54c1f9d3a1",type:"Weight Loss",calories:320},
+    {name:"Greek Yogurt Bowl",image:"https://images.unsplash.com/photo-1488477181946-6428a0291777",type:"High Protein",calories:200},
+    {name:"Grilled Chicken Veggie Plate",image:"https://images.unsplash.com/photo-1546069901-ba9599a7e63c",type:"Low Carb",calories:350},
+    {name:"Salmon Avocado Salad",image:"https://images.unsplash.com/photo-1551248429-40975aa4de74",type:"Healthy Fats",calories:340},
+    {name:"Green Smoothie Bowl",image:"https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea",type:"Detox",calories:260}
+  ]
 };
 
 let currentMeal=null;
