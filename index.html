@@ -80,6 +80,17 @@ td, th {border:1px solid #ccc;padding:8px;text-align:center;}
 </select>
 <br>
 <button onclick="recommendMeal()">Recommend Meal</button>
+  <button onclick="startGame()">Play Guess the Meal Game</button>
+
+<h3 id="gameQuestion"></h3>
+<div id="gameOptions" style="display:none;">
+  <button onclick="submitGuess('breakfast')">Breakfast</button>
+  <button onclick="submitGuess('lunch')">Lunch</button>
+  <button onclick="submitGuess('dinner')">Dinner</button>
+  <button onclick="submitGuess('diet')">Diet / Healthy</button>
+</div>
+
+<p id="gameResult"></p>
 <button onclick="generateSteps()">AI Cooking Steps</button>
 <button onclick="saveFavorite()">Save Favorite</button>
 <button onclick="subscribe()">Subscribe / Paywall</button>
