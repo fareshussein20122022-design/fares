@@ -1,328 +1,270 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Smart Meal Recommender Pro</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
-/* ---------------- Reset & Body ---------------- */
-body{
-  font-family:'Poppins',sans-serif;
-  margin:0;
-  padding:0;
-  background:linear-gradient(-45deg,#6a85ff,#8fd3f4,#c2e9fb,#a1c4fd);
-  background-size:400% 400%;
-  animation:gradientMove 12s ease infinite;
-  color:#333;
-}
-@keyframes gradientMove{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meal Pro Infinity | Your Ultimate Health Suite</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1; --secondary: #a855f7; --accent: #00d2ff;
+            --water: #3b82f6; --bg: #0f172a; --text: #f1f5f9;
+            --glass: rgba(255, 255, 255, 0.03); --glass-border: rgba(255, 255, 255, 0.1);
+        }
 
-/* ---------------- Header ---------------- */
-header{
-  position:sticky;
-  top:0;
-  background:rgba(255,255,255,0.95);
-  padding:20px;
-  text-align:center;
-  font-size:2em;
-  font-weight:700;
-  box-shadow:0 3px 10px rgba(0,0,0,0.2);
-  z-index:100;
-}
+        .light-mode {
+            --bg: #f8fafc; --text: #1e293b; --glass: rgba(255, 255, 255, 0.6);
+            --glass-border: rgba(0, 0, 0, 0.05);
+        }
 
-/* ---------------- Card ---------------- */
-.card{
-  background:white;
-  max-width:900px;
-  margin:40px auto;
-  padding:30px;
-  border-radius:20px;
-  box-shadow:0 10px 30px rgba(0,0,0,.15);
-  transition:all 0.3s ease;
-}
-body.dark-mode .card{
-  background:#2c2c2c;
-  color:#eee;
-}
+        body {
+            font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text);
+            margin: 0; padding: 10px; transition: background 0.8s ease;
+            overflow-x: hidden; min-height: 100vh;
+        }
 
-/* ---------------- Buttons ---------------- */
-button{
-  padding:12px 20px;
-  margin:6px;
-  border-radius:12px;
-  border:none;
-  font-size:15px;
-  background:linear-gradient(45deg,#4f7cff,#7c4dff);
-  color:white;
-  cursor:pointer;
-  transition:0.3s;
-}
-button:hover{opacity:0.85;}
+        #particleCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
 
-/* ---------------- Inputs & Select ---------------- */
-input, select{
-  padding:8px;
-  margin:5px;
-  border-radius:8px;
-  border:1px solid #ccc;
-}
-body.dark-mode input, body.dark-mode select{background:#444;color:#eee;border:1px solid #666;}
+        .container { max-width: 1000px; margin: auto; position: relative; z-index: 1; padding: 10px; }
 
-/* ---------------- Images ---------------- */
-img{
-  width:100%;
-  border-radius:15px;
-  margin-top:15px;
-  opacity:0;
-  transform:scale(.9);
-  transition:0.5s;
-}
-img.show{opacity:1;transform:scale(1);}
+        .glass-card {
+            background: var(--glass); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border); border-radius: 30px; padding: 25px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1); margin-bottom: 20px;
+            animation: floatIn 0.8s ease-out; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
 
-/* ---------------- Spinner ---------------- */
-.spinner{
-  display:none;
-  margin:auto;
-  border:6px solid #eee;
-  border-top:6px solid #4f7cff;
-  border-radius:50%;
-  width:40px;
-  height:40px;
-  animation:spin 1s linear infinite;
-}
-@keyframes spin{100%{transform:rotate(360deg);}}
+        @keyframes floatIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
-/* ---------------- Table ---------------- */
-table{
-  width:100%;
-  border-collapse:collapse;
-  margin-top:15px;
-}
-td, th{
-  border:1px solid #ccc;
-  padding:8px;
-  text-align:center;
-}
-body.dark-mode td, body.dark-mode th{border:1px solid #666;}
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; }
 
-/* ---------------- Sections ---------------- */
-.section{margin-top:30px;}
-.section h3{margin-bottom:10px;}
-ul{list-style-type:disc; padding-left:20px; text-align:left;}
-</style>
+        /* Progress Visuals */
+        .ring-box { position: relative; width: 140px; height: 140px; margin: auto; }
+        .ring-label { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: 800; font-size: 1.2rem; }
+
+        .bottle { width: 60px; height: 100px; border: 3px solid var(--water); margin: 10px auto; border-radius: 10px; overflow: hidden; position: relative; }
+        .wave { position: absolute; bottom: 0; width: 200%; height: 0%; background: var(--water); animation: wave 3s linear infinite; left: -50%; transition: 1s ease; }
+        @keyframes wave { 0% { transform: translateX(0) rotate(0deg); } 100% { transform: translateX(25%) rotate(360deg); } }
+
+        /* Form Elements */
+        input, select { background: var(--glass); border: 1px solid var(--glass-border); padding: 12px; border-radius: 12px; color: var(--text); font-family: inherit; width: 100%; }
+        button { background: linear-gradient(135deg, var(--primary), var(--secondary)); border: none; padding: 15px 25px; border-radius: 15px; color: white; font-weight: 700; cursor: pointer; transition: 0.3s; width: 100%; }
+        button:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3); }
+
+        #mealImage { width: 100%; border-radius: 20px; display: none; margin-top: 15px; animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes pop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        .xp-bar { height: 10px; background: rgba(0,0,0,0.1); border-radius: 10px; overflow: hidden; margin-top: 10px; }
+        .xp-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--secondary)); transition: 0.5s; }
+    </style>
 </head>
-<body>
+<body class="dark-mode">
 
-<header>Smart Meal Recommender Pro</header>
+<canvas id="particleCanvas"></canvas>
 
-<div class="card">
+<div class="container">
+    <header style="display: flex; justify-content: space-between; align-items: center; padding: 20px 0;">
+        <h1 style="margin:0; font-weight: 800; letter-spacing: -2px; font-size: 2.2rem;">MEAL<span style="color: var(--primary)">PRO</span></h1>
+        <button onclick="toggleTheme()" style="width: auto; background: var(--glass); border: 1px solid var(--glass-border); color: var(--text);">🌓 Theme</button>
+    </header>
 
-<!-- THEME TOGGLE -->
-<div class="section">
-  <button onclick="toggleTheme()">Toggle Light / Dark Mode</button>
-</div>
+    <div class="dashboard-grid">
+        <div class="glass-card" style="text-align: center;">
+            <h3 style="margin-top:0;">Nutrition</h3>
+            <div class="ring-box"><canvas id="ringChart"></canvas><div class="ring-label" id="calPerc">0%</div></div>
+            <p><span id="cals">0</span> / <span id="goal">2000</span> kcal</p>
+        </div>
 
-<!-- MEAL RECOMMENDATION -->
-<div class="section">
-  <h3>Meal Recommendation</h3>
-  <select id="mealType">
-    <option value="breakfast">Breakfast</option>
-    <option value="lunch">Lunch</option>
-    <option value="dinner">Dinner</option>
-    <option value="diet">Diet</option>
-  </select>
-  <br>
-  <button onclick="recommendMeal()">Recommend Meal</button>
-  <button onclick="generateSteps()">AI Cooking Steps</button>
-  <button onclick="saveFavorite()">Save Favorite (+XP)</button>
-  <div id="loadingSpinner" class="spinner"></div>
-  <h2 id="mealName"></h2>
-  <p id="mealCalories"></p>
-  <img id="mealImage" />
-  <ul id="steps"></ul>
-</div>
+        <div class="glass-card" style="text-align: center;">
+            <h3 style="margin-top:0;">Hydration</h3>
+            <div class="bottle"><div id="waterLevel" class="wave"></div></div>
+            <p><span id="waterCount">0</span>/8 Glasses</p>
+            <button onclick="addWater()">+ Drink</button>
+        </div>
 
-<!-- XP & Favorites -->
-<div class="section">
-  <h3>XP Level: <span id="xp">0</span></h3>
-  <h3>Your Favorites</h3>
-  <ul id="favorites"></ul>
-</div>
+        <div class="glass-card">
+            <h3 style="margin:0; opacity: 0.6; font-size: 0.8rem;">CURRENT STATUS</h3>
+            <h2 style="margin: 5px 0; color: var(--accent);">LVL <span id="lvl">1</span> — <span id="rank">Rookie</span></h2>
+            <p style="margin:0;">XP: <span id="xp">0</span></p>
+            <div class="xp-bar"><div id="xpFill" class="xp-fill"></div></div>
+            <button onclick="resetDay()" style="margin-top: 15px; background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid #ef4444;">Reset Day</button>
+        </div>
+    </div>
 
-<!-- CALORIE CHART -->
-<div class="section">
-  <h3>Calories Dashboard</h3>
-  <canvas id="calChart"></canvas>
-</div>
+    <div class="glass-card">
+        <h3>👤 Profile & BMR Settings</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+            <input type="number" id="uWeight" placeholder="Weight (kg)">
+            <input type="number" id="uHeight" placeholder="Height (cm)">
+            <input type="number" id="uAge" placeholder="Age">
+            <select id="uGoal">
+                <option value="lose">Lose Weight</option>
+                <option value="maintain">Maintain</option>
+                <option value="gain">Gain Muscle</option>
+            </select>
+        </div>
+        <button onclick="calcBMR()">Calculate & Save</button>
+    </div>
 
-<!-- WEEKLY PLANNER -->
-<div class="section">
-  <h3>Weekly Meal Planner</h3>
-  <table id="planner">
-    <tr><th>Day</th><th>Meal</th></tr>
-    <tr><td>Monday</td><td><select id="monday"></select></td></tr>
-    <tr><td>Tuesday</td><td><select id="tuesday"></select></td></tr>
-    <tr><td>Wednesday</td><td><select id="wednesday"></select></td></tr>
-    <tr><td>Thursday</td><td><select id="thursday"></select></td></tr>
-    <tr><td>Friday</td><td><select id="friday"></select></td></tr>
-    <tr><td>Saturday</td><td><select id="saturday"></select></td></tr>
-    <tr><td>Sunday</td><td><select id="sunday"></select></td></tr>
-  </table>
-  <button onclick="savePlanner()">Save Planner</button>
-</div>
-
-<!-- GUESS THE MEAL GAME -->
-<div class="section">
-  <h3>Guess the Meal Game</h3>
-  <p id="gameQuestion"></p>
-  <div id="gameOptions" style="display:none;">
-    <button onclick="submitGuess('breakfast')">Breakfast</button>
-    <button onclick="submitGuess('lunch')">Lunch</button>
-    <button onclick="submitGuess('dinner')">Dinner</button>
-    <button onclick="submitGuess('diet')">Diet</button>
-  </div>
-  <p id="gameResult"></p>
-  <button onclick="startGame()">Start Game</button>
-</div>
-
+    <div class="glass-card">
+        <h3>🍳 Smart Meal Generator</h3>
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <select id="mType" style="flex: 2;">
+                <option value="breakfast">Breakfast</option>
+                <option value="lunch">Lunch</option>
+                <option value="dinner">Dinner</option>
+            </select>
+            <button onclick="getMeal()" style="flex: 1;">Generate</button>
+        </div>
+        <div id="mDisplay" style="text-align: center;">
+            <h2 id="mName" style="margin: 0;"></h2>
+            <img id="mealImage">
+            <canvas id="macroChart" style="max-height: 180px; margin-top: 15px;"></canvas>
+        </div>
+    </div>
 </div>
 
 <script>
-// ---------------- DATA ----------------
-const meals={
-breakfast:[
-{name:"Pancakes",image:"https://eggs.ca/wp-content/uploads/2024/06/fluffy-pancakes-1664x832-1.jpg", calories:350, type:"none"},
-{name:"Omelette",image:"https://images.unsplash.com/photo-1510693206972-df098062cb71", calories:250, type:"vegetarian"},
-{name:"French Toast",image:"https://images.unsplash.com/photo-1484723091739-30a097e8f929", calories:300, type:"vegetarian"},
-{name:"Bagel with Cream Cheese",image:"https://images.unsplash.com/photo-1509440159596-0249088772ff", calories:280, type:"vegetarian"},
-{name:"Fruit Smoothie",image:"https://images.unsplash.com/photo-1497534446932-c925b458314e", calories:180, type:"vegan"},
-{name:"Breakfast Burrito",image:"https://images.unsplash.com/photo-1600891964599-f61ba0e24092", calories:400, type:"none"},
-{name:"Granola Bowl",image:"https://images.unsplash.com/photo-1512621776951-a57141f2eefd", calories:320, type:"vegetarian"},
-{name:"Croissant",image:"https://images.unsplash.com/photo-1509440159596-0249088772ff", calories:300, type:"vegetarian"},
-{name:"Waffles",image:"https://images.unsplash.com/photo-1506084868230-bb9d95c24759", calories:360, type:"vegetarian"},
-{name:"Egg Muffins",image:"https://images.unsplash.com/photo-1495195134817-aeb325a55b65", calories:250, type:"none"}
-],
+// --- DATABASE (40+ Meals) ---
+const meals = {
+    breakfast: [
+        {n:"Avocado Toast", c:320, p:8, cb:35, f:15, img:"https://images.unsplash.com/photo-1525351484163-7529414344d8?w=500"},
+        {n:"Greek Yogurt Bowl", c:250, p:20, cb:25, f:5, img:"https://images.unsplash.com/photo-1488477181946-6428a0291777?w=500"},
+        {n:"Oatmeal & Berries", c:300, p:10, cb:50, f:6, img:"https://images.unsplash.com/photo-1517673132405-a56a62b18caf?w=500"},
+        {n:"Protein Pancakes", c:400, p:25, cb:45, f:10, img:"https://images.unsplash.com/photo-1528207776546-365bb710ee93?w=500"},
+        {n:"Spinach Omelette", c:280, p:18, cb:4, f:22, img:"https://images.unsplash.com/photo-1510693206972-df098062cb71?w=500"},
+        {n:"Breakfast Burrito", c:550, p:22, cb:60, f:25, img:"https://images.unsplash.com/photo-1589135398302-388cd356794f?w=500"},
+        {n:"Chia Seed Pudding", c:220, p:8, cb:20, f:12, img:"https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500"},
+        {n:"Smoothie Bowl", c:350, p:12, cb:65, f:8, img:"https://images.unsplash.com/photo-1494390248081-4e521a5940db?w=500"},
+        {n:"Egg & Cheese Bagel", c:480, p:20, cb:55, f:18, img:"https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=500"},
+        {n:"Fruit Salad & Nuts", c:210, p:5, cb:30, f:12, img:"https://images.unsplash.com/photo-1490818387583-1baba5e638af?w=500"}
+    ],
+    lunch: [
+        {n:"Quinoa Salad", c:380, p:12, cb:55, f:14, img:"https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500"},
+        {n:"Chicken Wrap", c:420, p:35, cb:40, f:15, img:"https://images.unsplash.com/photo-1626700051175-6818013e1d4f?w=500"},
+        {n:"Tuna Melt", c:510, p:30, cb:45, f:22, img:"https://images.unsplash.com/photo-1525351326368-efbb5cb6814d?w=500"},
+        {n:"Turkey Club", c:580, p:32, cb:50, f:28, img:"https://images.unsplash.com/photo-1524339939944-12c6104f0abc?w=500"},
+        {n:"Lentil Soup", c:310, p:18, cb:45, f:5, img:"https://images.unsplash.com/photo-1547592166-23ac45744acd?w=500"},
+        {n:"Poke Bowl", c:490, p:25, cb:65, f:12, img:"https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500"},
+        {n:"Chicken Caesar", c:450, p:30, cb:15, f:30, img:"https://images.unsplash.com/photo-1512852939750-1305098529bf?w=500"},
+        {n:"Caprese Panini", c:410, p:15, cb:48, f:18, img:"https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=500"},
+        {n:"Miso Ramen", c:520, p:20, cb:70, f:18, img:"https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=500"},
+        {n:"Hummus Veggie Plate", c:350, p:14, cb:40, f:16, img:"https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=500"}
+    ],
+    dinner: [
+        {n:"Grilled Salmon", c:520, p:40, cb:5, f:35, img:"https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=500"},
+        {n:"Steak & Broccoli", c:680, p:55, cb:10, f:45, img:"https://images.unsplash.com/photo-1544025162-d76694265947?w=500"},
+        {n:"Shrimp Pasta", c:610, p:30, cb:75, f:20, img:"https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=500"},
+        {n:"Stuffed Peppers", c:430, p:25, cb:40, f:18, img:"https://images.unsplash.com/photo-1590412200988-a436bb7050a8?w=500"},
+        {n:"Chicken Stir-Fry", c:480, p:35, cb:45, f:12, img:"https://images.unsplash.com/photo-1512058564366-18510be2db19?w=500"},
+        {n:"Lamb Chops", c:750, p:45, cb:0, f:60, img:"https://images.unsplash.com/photo-1603048297172-c92544798d5a?w=500"},
+        {n:"Vegetable Curry", c:390, p:12, cb:60, f:15, img:"https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=500"},
+        {n:"Fish Tacos", c:540, p:28, cb:55, f:22, img:"https://images.unsplash.com/photo-1512838243191-e81e8f66f1fd?w=500"},
+        {n:"Baked Tofu Bowl", c:360, p:24, cb:35, f:14, img:"https://images.unsplash.com/photo-1546069901-e51626a3d937?w=500"},
+        {n:"Roasted Chicken", c:620, p:48, cb:15, f:40, img:"https://images.unsplash.com/photo-1532550907401-a500c9a57435?w=500"}
+    ]
+};
 
-lunch:[
-{name:"Chicken Sandwich",image:"https://seasonedskilletblog.com/wp-content/uploads/2022/08/spicy-crispy-chicken-sandwich-07.jpg", calories:450, type:"none"},
-{name:"Burger",image:"https://images.unsplash.com/photo-1550547660-d9450f859349", calories:600, type:"none"},
-{name:"Sushi",image:"https://images.unsplash.com/photo-1553621042-f6e147245754", calories:300, type:"none"},
-{name:"Wrap",image:"https://images.unsplash.com/photo-1565299624946-b28f40a0ae38", calories:350, type:"vegetarian"},
-{name:"Fried Rice",image:"https://images.unsplash.com/photo-1604908177522-040f6d5db5f6", calories:400, type:"vegetarian"},
-{name:"Pizza Slice",image:"https://images.unsplash.com/photo-1548365328-8b849e8d2b4c", calories:500, type:"vegetarian"},
-{name:"Chicken Salad",image:"https://images.unsplash.com/photo-1550304943-4f24f54ddde9", calories:320, type:"none"},
-{name:"Tacos",image:"https://images.unsplash.com/photo-1551504734-5ee1c4a1479b", calories:450, type:"none"},
-{name:"Noodles",image:"https://images.unsplash.com/photo-1585032226651-759b368d7246", calories:400, type:"vegetarian"},
-{name:"Falafel Wrap",image:"https://images.unsplash.com/photo-1546069901-eacef0df6022", calories:350, type:"vegan"}
-],
+// --- CORE APP LOGIC ---
+let data = JSON.parse(localStorage.getItem('mealInfinityOfficial')) || { 
+    xp: 0, cals: 0, water: 0, weight: 70, height: 175, age: 25, goal: 2000, theme: 'dark' 
+};
 
-dinner:[
-{name:"Steak",image:"https://www.allrecipes.com/thmb/OJ28fIFte6Pyg93ML8IM-APbu1Y=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/AR-14554-sirloin-steak-with-garlic-butter-hero-4x3-d12fa79836754fcf850388e4677bbf55.jpg", calories:700, type:"none"},
-{name:"Grilled Chicken",image:"https://images.unsplash.com/photo-1600891964092-4316c288032e", calories:500, type:"none"},
-{name:"Salmon",image:"https://images.unsplash.com/photo-1467003909585-2f8a72700288", calories:450, type:"none"},
-{name:"Pasta Alfredo",image:"https://images.unsplash.com/photo-1525755662778-989d0524087e", calories:600, type:"vegetarian"},
-{name:"BBQ Ribs",image:"https://images.unsplash.com/photo-1555939594-58d7cb561ad1", calories:650, type:"none"},
-{name:"Roasted Vegetables",image:"https://images.unsplash.com/photo-1512621776951-a57141f2eefd", calories:350, type:"vegetarian"},
-{name:"Curry",image:"https://images.unsplash.com/photo-1605478033166-4f02c3d01c9b", calories:400, type:"vegetarian"},
-{name:"Lasagna",image:"https://images.unsplash.com/photo-1603133872878-684f208fb84b", calories:600, type:"vegetarian"},
-{name:"Stuffed Peppers",image:"https://images.unsplash.com/photo-1604908177522-040f6d5db5f6", calories:450, type:"vegetarian"},
-{name:"Chicken Biryani",image:"https://images.unsplash.com/photo-1604908177522-040f6d5db5f6", calories:550, type:"none"}
-],
+let ringChart, macroChart;
 
-diet:[
-{name:"Quinoa Salad",image:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDkgWQfaBu9Fp8WzllAzodvVYQi5mScx2maQ&s", calories:320, type:"vegan"},
-{name:"Greek Yogurt Bowl",image:"https://images.unsplash.com/photo-1488477181946-6428a0291777", calories:250, type:"vegetarian"},
-{name:"Oatmeal",image:"https://images.unsplash.com/photo-1517677208171-0bc6725a3e60", calories:200, type:"vegetarian"},
-{name:"Grilled Fish",image:"https://images.unsplash.com/photo-1467003909585-2f8a72700288", calories:400, type:"none"},
-{name:"Vegetable Soup",image:"https://images.unsplash.com/photo-1543353071-10c8ba85a904", calories:180, type:"vegan"},
-{name:"Fruit Salad",image:"https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea", calories:150, type:"vegan"},
-{name:"Chicken & Veg Bowl",image:"https://images.unsplash.com/photo-1600891964092-4316c288032e", calories:350, type:"none"},
-{name:"Lentil Salad",image:"https://images.unsplash.com/photo-1546069901-eacef0df6022", calories:300, type:"vegan"},
-{name:"Zucchini Noodles",image:"https://images.unsplash.com/photo-1525755662778-989d0524087e", calories:250, type:"vegetarian"},
-{name:"Tofu Stir Fry",image:"https://images.unsplash.com/photo-1512621776951-a57141f2eefd", calories:320, type:"vegan"}
-]
+// Particle Background
+const canvas = document.getElementById('particleCanvas');
+const ctx = canvas.getContext('2d');
+let pts = [];
+function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+window.onresize = resize; resize();
 
+class Pt {
+    constructor() { this.x = Math.random()*canvas.width; this.y = Math.random()*canvas.height; this.s = Math.random()*2; this.vx = Math.random()-0.5; this.vy = Math.random()-0.5; }
+    draw() { ctx.fillStyle = data.theme==='dark'?'#fff':'#6366f1'; ctx.globalAlpha = 0.2; ctx.beginPath(); ctx.arc(this.x,this.y,this.s,0,Math.PI*2); ctx.fill(); }
+    move() { this.x+=this.vx; this.y+=this.vy; if(this.x<0||this.x>canvas.width) this.vx*=-1; if(this.y<0||this.y>canvas.height) this.vy*=-1; }
+}
+for(let i=0;i<60;i++) pts.push(new Pt());
+function anim() { ctx.clearRect(0,0,canvas.width,canvas.height); pts.forEach(p=>{p.move();p.draw();}); requestAnimationFrame(anim); }
+anim();
 
-// ---------------- VARIABLES ----------------
-let currentMeal=null;
-let gameMeal=null;
-let xp=0;
+// App Functions
+function toggleTheme() { data.theme = data.theme==='dark'?'light':'dark'; document.body.className = data.theme+"-mode"; save(); }
 
-// ---------------- FUNCTIONS ----------------
-function addXP(v){xp+=v; document.getElementById('xp').innerText=xp;}
-function recommendMeal(){
-  const type=document.getElementById('mealType').value;
-  const options=meals[type];
-  currentMeal=options[Math.floor(Math.random()*options.length)];
-  showMeal(currentMeal);
-}
-function showMeal(meal){
-  document.getElementById('mealName').innerText=meal.name;
-  document.getElementById('mealCalories').innerText='Calories: '+meal.calories;
-  const img=document.getElementById('mealImage');
-  img.classList.remove('show'); img.src=meal.image;
-  setTimeout(()=>img.classList.add('show'),100);
-  document.getElementById('steps').innerHTML='';
-}
-function generateSteps(){
-  if(!currentMeal)return alert('Pick a meal first');
-  const steps=['Prep Ingredients','Cook Meal','Plate & Serve'];
-  const list=document.getElementById('steps'); list.innerHTML='';
-  steps.forEach(s=>{let li=document.createElement('li'); li.innerText=s; list.appendChild(li);});
-}
-function saveFavorite(){
-  if(!currentMeal)return alert('Pick a meal first');
-  let favs=JSON.parse(localStorage.getItem('favorites')||'[]');
-  favs.push(currentMeal);
-  localStorage.setItem('favorites',JSON.stringify(favs));
-  addXP(10); loadFavorites(); updateChart();
-}
-function loadFavorites(){
-  const list=document.getElementById('favorites');
-  list.innerHTML='';
-  JSON.parse(localStorage.getItem('favorites')||'[]').forEach(f=>{
-    const li=document.createElement('li');
-    li.innerText=`${f.name} - ${f.calories} cal`;
-    list.appendChild(li);
-  });
-}
-let chart;
-function updateChart(){
-  const favs=JSON.parse(localStorage.getItem('favorites')||'[]');
-  const data=favs.map(f=>f.calories);
-  if(chart) chart.destroy();
-  chart=new Chart(document.getElementById('calChart'),{
-    type:'bar',
-    data:{labels:favs.map(f=>f.name),datasets:[{data:data,label:'Calories',backgroundColor:'#4f7cff'}]}
-  });
-}
-function toggleTheme(){document.body.classList.toggle('dark-mode');}
-function populatePlanner(){
-  const all=[].concat(meals.breakfast,meals.lunch,meals.dinner,meals.diet);
-  ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'].forEach(day=>{
-    const select=document.getElementById(day);
-    all.forEach(m=>{let opt=document.createElement('option'); opt.value=m.name; opt.innerText=`${m.name} (${m.calories} cal)`; select.appendChild(opt);});
-  });
-}
-function savePlanner(){alert('Planner saved locally!');}
-function startGame(){
-  const all=[].concat(meals.breakfast,meals.lunch,meals.dinner,meals.diet);
-  gameMeal=all[Math.floor(Math.random()*all.length)];
-  document.getElementById('gameQuestion').innerText='What type is '+gameMeal.name+'?';
-  document.getElementById('gameOptions').style.display='block';
-}
-function submitGuess(type){
-  if(type===gameMeal.type){document.getElementById('gameResult').innerText='Correct! +20 XP'; addXP(20);}
-  else document.getElementById('gameResult').innerText='Wrong!';
+function updateUI() {
+    document.getElementById('cals').innerText = data.cals;
+    document.getElementById('waterCount').innerText = data.water;
+    document.getElementById('waterLevel').style.height = (data.water/8*100)+"%";
+    document.getElementById('xp').innerText = Math.round(data.xp);
+    document.getElementById('lvl').innerText = Math.floor(data.xp/500)+1;
+    document.getElementById('xpFill').style.width = (data.xp%500/5)+"%";
+    
+    let perc = Math.min(Math.round((data.cals/data.goal)*100), 100);
+    document.getElementById('calPerc').innerText = perc+"%";
+    
+    const ranks = ["Rookie", "Novice", "Expert", "Elite", "Legend"];
+    document.getElementById('rank').innerText = ranks[Math.min(Math.floor(data.xp/1500), 4)];
+    
+    if(ringChart) { ringChart.data.datasets[0].data = [data.cals, Math.max(0, data.goal-data.cals)]; ringChart.update(); }
 }
 
-// ---------------- INIT ----------------
-populatePlanner();
-loadFavorites();
-updateChart();
+function calcBMR() {
+    const w = parseFloat(document.getElementById('uWeight').value)||data.weight;
+    const h = parseFloat(document.getElementById('uHeight').value)||data.height;
+    const a = parseInt(document.getElementById('uAge').value)||data.age;
+    const g = document.getElementById('uGoal').value;
+    
+    let bmr = (10*w)+(6.25*h)-(5*a)+5;
+    if(g==='lose') data.goal = Math.round(bmr*1.2-500);
+    else if(g==='gain') data.goal = Math.round(bmr*1.5);
+    else data.goal = Math.round(bmr*1.3);
+
+    data.weight=w; data.height=h; data.age=a; save(); updateUI();
+    alert("Profile Updated! Target: " + data.goal + " kcal");
+}
+
+function addWater() { if(data.water<8) { data.water++; data.xp+=20; updateUI(); save(); } }
+
+function getMeal() {
+    const type = document.getElementById('mType').value;
+    const pool = meals[type];
+    const meal = pool[Math.floor(Math.random()*pool.length)];
+    
+    document.getElementById('mName').innerText = meal.n;
+    const img = document.getElementById('mealImage');
+    img.src = meal.img; img.style.display = 'block';
+    
+    macroChart.data.datasets[0].data = [meal.p, meal.cb, meal.f];
+    macroChart.update();
+
+    data.cals += meal.c; data.xp += 50; updateUI(); save();
+}
+
+function initCharts() {
+    const rCtx = document.getElementById('ringChart').getContext('2d');
+    ringChart = new Chart(rCtx, {
+        type: 'doughnut',
+        data: { datasets: [{ data: [0, 2000], backgroundColor: ['#6366f1', 'rgba(100,100,100,0.1)'], borderWidth: 0 }] },
+        options: { cutout: '85%', plugins: { legend: { display: false } } }
+    });
+
+    const mCtx = document.getElementById('macroChart').getContext('2d');
+    macroChart = new Chart(mCtx, {
+        type: 'pie',
+        data: { labels: ['P', 'C', 'F'], datasets: [{ data: [1,1,1], backgroundColor: ['#f43f5e', '#6366f1', '#fbbf24'] }] },
+        options: { plugins: { legend: { position: 'bottom', labels: { color: data.theme==='dark'?'#fff':'#000' } } } }
+    });
+}
+
+function resetDay() { data.cals = 0; data.water = 0; save(); updateUI(); }
+function save() { localStorage.setItem('mealInfinityOfficial', JSON.stringify(data)); }
+
+window.onload = () => {
+    document.body.className = data.theme+"-mode";
+    initCharts();
+    updateUI();
+};
 </script>
-
 </body>
 </html>
