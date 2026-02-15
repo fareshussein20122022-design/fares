@@ -6,155 +6,192 @@
 <title>Smart Meal Recommender Pro</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.1.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.1.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.1.0/firebase-functions-compat.js"></script>
-<script src="https://js.stripe.com/v3/"></script>
 <style>
-body{font-family:'Poppins',sans-serif;text-align:center;padding:40px;transition:background 0.3s,color 0.3s;}
-body.light-mode{background:linear-gradient(-45deg,#6a85ff,#8fd3f4,#c2e9fb,#a1c4fd);color:#333;background-size:400% 400%;animation:gradientMove 12s ease infinite;}
-body.dark-mode{background:linear-gradient(120deg,#1e1e1e,#3a3a3a);color:#eee;}
+/* ---------------- Reset & Body ---------------- */
+body{
+  font-family:'Poppins',sans-serif;
+  margin:0;
+  padding:0;
+  background:linear-gradient(-45deg,#6a85ff,#8fd3f4,#c2e9fb,#a1c4fd);
+  background-size:400% 400%;
+  animation:gradientMove 12s ease infinite;
+  color:#333;
+}
 @keyframes gradientMove{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-.card{background:white;max-width:700px;margin:auto;padding:25px;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,.15);transition:background 0.3s,color 0.3s;}
-body.dark-mode .card{background:#2c2c2c;color:#eee;}
-button{padding:12px 18px;margin:8px;border-radius:12px;border:none;font-size:15px;background:linear-gradient(45deg,#4f7cff,#7c4dff);color:white;cursor:pointer;transition:0.3s;}
+
+/* ---------------- Header ---------------- */
+header{
+  position:sticky;
+  top:0;
+  background:rgba(255,255,255,0.95);
+  padding:20px;
+  text-align:center;
+  font-size:2em;
+  font-weight:700;
+  box-shadow:0 3px 10px rgba(0,0,0,0.2);
+  z-index:100;
+}
+
+/* ---------------- Card ---------------- */
+.card{
+  background:white;
+  max-width:900px;
+  margin:40px auto;
+  padding:30px;
+  border-radius:20px;
+  box-shadow:0 10px 30px rgba(0,0,0,.15);
+  transition:all 0.3s ease;
+}
+body.dark-mode .card{
+  background:#2c2c2c;
+  color:#eee;
+}
+
+/* ---------------- Buttons ---------------- */
+button{
+  padding:12px 20px;
+  margin:6px;
+  border-radius:12px;
+  border:none;
+  font-size:15px;
+  background:linear-gradient(45deg,#4f7cff,#7c4dff);
+  color:white;
+  cursor:pointer;
+  transition:0.3s;
+}
 button:hover{opacity:0.85;}
-img{width:100%;border-radius:15px;margin-top:15px;opacity:0;transform:scale(.9);transition:.5s;}
+
+/* ---------------- Inputs & Select ---------------- */
+input, select{
+  padding:8px;
+  margin:5px;
+  border-radius:8px;
+  border:1px solid #ccc;
+}
+body.dark-mode input, body.dark-mode select{background:#444;color:#eee;border:1px solid #666;}
+
+/* ---------------- Images ---------------- */
+img{
+  width:100%;
+  border-radius:15px;
+  margin-top:15px;
+  opacity:0;
+  transform:scale(.9);
+  transition:0.5s;
+}
 img.show{opacity:1;transform:scale(1);}
-.spinner{display:none;margin:auto;border:6px solid #eee;border-top:6px solid #4f7cff;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite;}
+
+/* ---------------- Spinner ---------------- */
+.spinner{
+  display:none;
+  margin:auto;
+  border:6px solid #eee;
+  border-top:6px solid #4f7cff;
+  border-radius:50%;
+  width:40px;
+  height:40px;
+  animation:spin 1s linear infinite;
+}
 @keyframes spin{100%{transform:rotate(360deg);}}
-input, select{padding:8px;margin:5px;border-radius:8px;border:1px solid #ccc;}
-table{width:100%;border-collapse:collapse;margin-top:15px;}
-td, th{border:1px solid #ccc;padding:8px;text-align:center;}
+
+/* ---------------- Table ---------------- */
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:15px;
+}
+td, th{
+  border:1px solid #ccc;
+  padding:8px;
+  text-align:center;
+}
+body.dark-mode td, body.dark-mode th{border:1px solid #666;}
+
+/* ---------------- Sections ---------------- */
+.section{margin-top:30px;}
+.section h3{margin-bottom:10px;}
+ul{list-style-type:disc; padding-left:20px; text-align:left;}
 </style>
 </head>
-<body class="light-mode">
+<body>
 
-<h1>Smart Meal Recommender Pro</h1>
+<header>Smart Meal Recommender Pro</header>
 
 <div class="card">
 
-<!-- AUTH -->
-<div id="authSection">
-<h3>Sign In / Register</h3>
-<input type="email" id="email" placeholder="Email">
-<input type="password" id="password" placeholder="Password">
-<br>
-<button onclick="registerEmail()">Register</button>
-<button onclick="loginEmail()">Login</button>
-<button onclick="logoutUser()">Logout</button>
+<!-- THEME TOGGLE -->
+<div class="section">
+  <button onclick="toggleTheme()">Toggle Light / Dark Mode</button>
 </div>
-
-<button onclick="toggleTheme()">Toggle Light/Dark Mode</button>
-
-<hr>
-
-<!-- PROFILE -->
-<h3>User Profile</h3>
-<label>Age: <input type="number" id="age" min="1" max="120"></label>
-<label>Weight (kg): <input type="number" id="weight" min="1" max="300"></label>
-<label>Activity Level:
-<select id="activity">
-<option value="low">Low</option>
-<option value="medium">Medium</option>
-<option value="high">High</option>
-</select>
-</label>
-<label>Diet Goal:
-<select id="dietGoal">
-<option value="maintain">Maintain Weight</option>
-<option value="lose">Lose Weight</option>
-<option value="gain">Gain Weight</option>
-</select>
-</label>
-<label>Dietary Restrictions:
-<select id="restriction">
-<option value="none">None</option>
-<option value="vegetarian">Vegetarian</option>
-<option value="vegan">Vegan</option>
-<option value="gluten-free">Gluten-Free</option>
-</select>
-</label>
-<button onclick="saveProfile()">Save Profile</button>
-
-<hr>
 
 <!-- MEAL RECOMMENDATION -->
-<select id="mealType">
-<option value="breakfast">Breakfast</option>
-<option value="lunch">Lunch</option>
-<option value="dinner">Dinner</option>
-<option value="diet">Diet</option>
-</select><br>
-<button onclick="recommendMeal()">Recommend Meal</button>
-<button onclick="generateSteps()">AI Cooking Steps</button>
-<button onclick="saveFavorite()">Save Favorite (+XP)</button>
-<button onclick="subscribe()">Subscribe / Paywall</button>
-<div id="loadingSpinner" class="spinner"></div>
+<div class="section">
+  <h3>Meal Recommendation</h3>
+  <select id="mealType">
+    <option value="breakfast">Breakfast</option>
+    <option value="lunch">Lunch</option>
+    <option value="dinner">Dinner</option>
+    <option value="diet">Diet</option>
+  </select>
+  <br>
+  <button onclick="recommendMeal()">Recommend Meal</button>
+  <button onclick="generateSteps()">AI Cooking Steps</button>
+  <button onclick="saveFavorite()">Save Favorite (+XP)</button>
+  <div id="loadingSpinner" class="spinner"></div>
+  <h2 id="mealName"></h2>
+  <p id="mealCalories"></p>
+  <img id="mealImage" />
+  <ul id="steps"></ul>
+</div>
 
-<h2 id="mealName"></h2>
-<p id="mealCalories"></p>
-<img id="mealImage" />
-<ul id="steps"></ul>
+<!-- XP & Favorites -->
+<div class="section">
+  <h3>XP Level: <span id="xp">0</span></h3>
+  <h3>Your Favorites</h3>
+  <ul id="favorites"></ul>
+</div>
 
-<h3>XP Level: <span id="xp">0</span></h3>
-<h3>Your Favorites</h3>
-<ul id="favorites"></ul>
-
-<h3>Calories Dashboard</h3>
-<canvas id="calChart"></canvas>
-
-<hr>
+<!-- CALORIE CHART -->
+<div class="section">
+  <h3>Calories Dashboard</h3>
+  <canvas id="calChart"></canvas>
+</div>
 
 <!-- WEEKLY PLANNER -->
-<h3>Weekly Meal Planner</h3>
-<table id="planner">
-<tr><th>Day</th><th>Meal</th></tr>
-<tr><td>Monday</td><td><select id="monday"></select></td></tr>
-<tr><td>Tuesday</td><td><select id="tuesday"></select></td></tr>
-<tr><td>Wednesday</td><td><select id="wednesday"></select></td></tr>
-<tr><td>Thursday</td><td><select id="thursday"></select></td></tr>
-<tr><td>Friday</td><td><select id="friday"></select></td></tr>
-<tr><td>Saturday</td><td><select id="saturday"></select></td></tr>
-<tr><td>Sunday</td><td><select id="sunday"></select></td></tr>
-</table>
-<button onclick="savePlanner()">Save Planner</button>
-
-<hr>
-
-<!-- GAME -->
-<h3>Guess the Meal Game</h3>
-<p id="gameQuestion"></p>
-<div id="gameOptions" style="display:none;">
-<button onclick="submitGuess('breakfast')">Breakfast</button>
-<button onclick="submitGuess('lunch')">Lunch</button>
-<button onclick="submitGuess('dinner')">Dinner</button>
-<button onclick="submitGuess('diet')">Diet</button>
+<div class="section">
+  <h3>Weekly Meal Planner</h3>
+  <table id="planner">
+    <tr><th>Day</th><th>Meal</th></tr>
+    <tr><td>Monday</td><td><select id="monday"></select></td></tr>
+    <tr><td>Tuesday</td><td><select id="tuesday"></select></td></tr>
+    <tr><td>Wednesday</td><td><select id="wednesday"></select></td></tr>
+    <tr><td>Thursday</td><td><select id="thursday"></select></td></tr>
+    <tr><td>Friday</td><td><select id="friday"></select></td></tr>
+    <tr><td>Saturday</td><td><select id="saturday"></select></td></tr>
+    <tr><td>Sunday</td><td><select id="sunday"></select></td></tr>
+  </table>
+  <button onclick="savePlanner()">Save Planner</button>
 </div>
-<p id="gameResult"></p>
-<button onclick="startGame()">Start Game</button>
+
+<!-- GUESS THE MEAL GAME -->
+<div class="section">
+  <h3>Guess the Meal Game</h3>
+  <p id="gameQuestion"></p>
+  <div id="gameOptions" style="display:none;">
+    <button onclick="submitGuess('breakfast')">Breakfast</button>
+    <button onclick="submitGuess('lunch')">Lunch</button>
+    <button onclick="submitGuess('dinner')">Dinner</button>
+    <button onclick="submitGuess('diet')">Diet</button>
+  </div>
+  <p id="gameResult"></p>
+  <button onclick="startGame()">Start Game</button>
+</div>
 
 </div>
 
 <script>
-// ---------------- Firebase ----------------
-const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT",
-  storageBucket: "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
-};
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
-const functions = firebase.functions();
-const stripe = Stripe("YOUR_STRIPE_PUBLIC_KEY");
-
-// ---------------- MEALS ----------------
-const meals = {
+// ---------------- DATA ----------------
+const meals={
 breakfast:[
 {name:"Pancakes",image:"https://eggs.ca/wp-content/uploads/2024/06/fluffy-pancakes-1664x832-1.jpg", calories:350, type:"none"},
 {name:"Omelette",image:"https://images.unsplash.com/photo-1510693206972-df098062cb71", calories:250, type:"vegetarian"},
@@ -180,6 +217,7 @@ lunch:[
 {name:"Noodles",image:"https://images.unsplash.com/photo-1585032226651-759b368d7246", calories:400, type:"vegetarian"},
 {name:"Falafel Wrap",image:"https://images.unsplash.com/photo-1546069901-eacef0df6022", calories:350, type:"vegan"}
 ],
+
 dinner:[
 {name:"Steak",image:"https://www.allrecipes.com/thmb/OJ28fIFte6Pyg93ML8IM-APbu1Y=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/AR-14554-sirloin-steak-with-garlic-butter-hero-4x3-d12fa79836754fcf850388e4677bbf55.jpg", calories:700, type:"none"},
 {name:"Grilled Chicken",image:"https://images.unsplash.com/photo-1600891964092-4316c288032e", calories:500, type:"none"},
@@ -206,163 +244,69 @@ diet:[
 {name:"Tofu Stir Fry",image:"https://images.unsplash.com/photo-1512621776951-a57141f2eefd", calories:320, type:"vegan"}
 ]
 
-let currentMeal = null;
-let gameMeal = null;
-let xp = 0;
 
-// ---------------- AUTH ----------------
-function registerEmail(){
-  const email = document.getElementById('email').value;
-  const password = document.getElementById('password').value;
-  if(!email||!password)return alert('Enter email and password');
-  auth.createUserWithEmailAndPassword(email,password).then(u=>{alert(`Account created! ${u.user.email}`); loadFavorites(); loadProfile();}).catch(e=>alert(e.message));
-}
-function loginEmail(){
-  const email = document.getElementById('email').value;
-  const password = document.getElementById('password').value;
-  if(!email||!password)return alert('Enter email and password');
-  auth.signInWithEmailAndPassword(email,password).then(u=>{alert(`Welcome back, ${u.user.email}`); loadFavorites(); loadProfile();}).catch(e=>alert(e.message));
-}
-function logoutUser(){auth.signOut().then(()=>alert('Logged out'));}
+// ---------------- VARIABLES ----------------
+let currentMeal=null;
+let gameMeal=null;
+let xp=0;
 
-auth.onAuthStateChanged(user=>{
-  if(user){loadFavorites(); loadProfile();}
-});
-
-// ---------------- PROFILE ----------------
-function saveProfile(){
-  const user = auth.currentUser;
-  if(!user) return alert('Login required');
-  const age=document.getElementById('age').value;
-  const weight=document.getElementById('weight').value;
-  const activity=document.getElementById('activity').value;
-  const dietGoal=document.getElementById('dietGoal').value;
-  const restriction=document.getElementById('restriction').value;
-  db.collection('users').doc(user.uid).set({age,weight,activity,dietGoal,restriction},{merge:true});
-  alert('Profile saved!');
-}
-function loadProfile(){
-  const user = auth.currentUser;
-  if(!user)return;
-  db.collection('users').doc(user.uid).get().then(doc=>{
-    const data=doc.data()||{};
-    document.getElementById('age').value=data.age||'';
-    document.getElementById('weight').value=data.weight||'';
-    document.getElementById('activity').value=data.activity||'medium';
-    document.getElementById('dietGoal').value=data.dietGoal||'maintain';
-    document.getElementById('restriction').value=data.restriction||'none';
-    xp = data.xp||0; document.getElementById('xp').innerText=xp;
-  });
-}
-
-// ---------------- XP ----------------
-function addXP(v){
-  xp+=v;
-  document.getElementById('xp').innerText=xp;
-  const user=auth.currentUser;
-  if(user) db.collection('users').doc(user.uid).set({xp},{merge:true});
-}
-
-// ---------------- MEAL RECOMMEND ----------------
+// ---------------- FUNCTIONS ----------------
+function addXP(v){xp+=v; document.getElementById('xp').innerText=xp;}
 function recommendMeal(){
-  const spinner=document.getElementById('loadingSpinner');
-  spinner.style.display='block';
   const type=document.getElementById('mealType').value;
-  const user=auth.currentUser;
-  let restriction='none';
-  if(user){
-    db.collection('users').doc(user.uid).get().then(doc=>{
-      restriction=doc.data()?.restriction||'none';
-      let options=meals[type].filter(m=>restriction==='none'||m.type===restriction);
-      currentMeal=options[Math.floor(Math.random()*options.length)];
-      showMeal(currentMeal);
-      spinner.style.display='none';
-    });
-  } else {
-    currentMeal=meals[type][Math.floor(Math.random()*meals[type].length)];
-    showMeal(currentMeal);
-    spinner.style.display='none';
-  }
+  const options=meals[type];
+  currentMeal=options[Math.floor(Math.random()*options.length)];
+  showMeal(currentMeal);
 }
 function showMeal(meal){
   document.getElementById('mealName').innerText=meal.name;
   document.getElementById('mealCalories').innerText='Calories: '+meal.calories;
   const img=document.getElementById('mealImage');
-  img.classList.remove('show');
-  img.src=meal.image;
+  img.classList.remove('show'); img.src=meal.image;
   setTimeout(()=>img.classList.add('show'),100);
   document.getElementById('steps').innerHTML='';
 }
-
-// ---------------- AI COOKING STEPS ----------------
 function generateSteps(){
   if(!currentMeal)return alert('Pick a meal first');
   const steps=['Prep Ingredients','Cook Meal','Plate & Serve'];
   const list=document.getElementById('steps'); list.innerHTML='';
   steps.forEach(s=>{let li=document.createElement('li'); li.innerText=s; list.appendChild(li);});
 }
-
-// ---------------- FAVORITES ----------------
 function saveFavorite(){
-  if(!currentMeal) return alert('Pick a meal first');
-  const user=auth.currentUser;
-  if(!user)return alert('Login required');
-  db.collection('users').doc(user.uid).set({favorites: firebase.firestore.FieldValue.arrayUnion(currentMeal)}, {merge:true});
+  if(!currentMeal)return alert('Pick a meal first');
+  let favs=JSON.parse(localStorage.getItem('favorites')||'[]');
+  favs.push(currentMeal);
+  localStorage.setItem('favorites',JSON.stringify(favs));
   addXP(10); loadFavorites(); updateChart();
 }
 function loadFavorites(){
   const list=document.getElementById('favorites');
   list.innerHTML='';
-  const user=auth.currentUser;
-  if(!user) return;
-  db.collection('users').doc(user.uid).get().then(doc=>{
-    (doc.data()?.favorites||[]).forEach(f=>{
-      let li=document.createElement('li'); li.innerText=`${f.name} - ${f.calories} cal`; list.appendChild(li);
-    });
-    updateChart();
+  JSON.parse(localStorage.getItem('favorites')||'[]').forEach(f=>{
+    const li=document.createElement('li');
+    li.innerText=`${f.name} - ${f.calories} cal`;
+    list.appendChild(li);
   });
 }
-
-// ---------------- CHART ----------------
 let chart;
 function updateChart(){
-  const user=auth.currentUser;
-  if(!user) return;
-  db.collection('users').doc(user.uid).get().then(doc=>{
-    const favs = doc.data()?.favorites||[];
-    const data=favs.map(f=>f.calories);
-    if(chart) chart.destroy();
-    chart=new Chart(document.getElementById('calChart'),{type:'bar',data:{labels:favs.map(f=>f.name),datasets:[{data:data,label:'Calories',backgroundColor:'#4f7cff'}]}});
+  const favs=JSON.parse(localStorage.getItem('favorites')||'[]');
+  const data=favs.map(f=>f.calories);
+  if(chart) chart.destroy();
+  chart=new Chart(document.getElementById('calChart'),{
+    type:'bar',
+    data:{labels:favs.map(f=>f.name),datasets:[{data:data,label:'Calories',backgroundColor:'#4f7cff'}]}
   });
 }
-
-// ---------------- THEME ----------------
-function toggleTheme(){
-  document.body.classList.toggle('dark-mode');
-  document.body.classList.toggle('light-mode');
-}
-
-// ---------------- WEEKLY PLANNER ----------------
+function toggleTheme(){document.body.classList.toggle('dark-mode');}
 function populatePlanner(){
-  const allMeals=[].concat(meals.breakfast,meals.lunch,meals.dinner,meals.diet);
+  const all=[].concat(meals.breakfast,meals.lunch,meals.dinner,meals.diet);
   ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'].forEach(day=>{
     const select=document.getElementById(day);
-    allMeals.forEach(m=>{let opt=document.createElement('option'); opt.value=m.name; opt.innerText=`${m.name} (${m.calories} cal)`; select.appendChild(opt);});
+    all.forEach(m=>{let opt=document.createElement('option'); opt.value=m.name; opt.innerText=`${m.name} (${m.calories} cal)`; select.appendChild(opt);});
   });
 }
-function savePlanner(){
-  const user=auth.currentUser;
-  if(!user)return alert('Login required');
-  const planner={};
-  ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'].forEach(day=>{
-    planner[day]=document.getElementById(day).value;
-  });
-  db.collection('users').doc(user.uid).set({planner},{merge:true});
-  alert('Planner saved!');
-}
-populatePlanner();
-
-// ---------------- GUESS THE MEAL GAME ----------------
+function savePlanner(){alert('Planner saved locally!');}
 function startGame(){
   const all=[].concat(meals.breakfast,meals.lunch,meals.dinner,meals.diet);
   gameMeal=all[Math.floor(Math.random()*all.length)];
@@ -374,17 +318,10 @@ function submitGuess(type){
   else document.getElementById('gameResult').innerText='Wrong!';
 }
 
-// ---------------- SUBSCRIBE ----------------
-async function subscribe(){
-  const user = auth.currentUser;
-  if(!user) return alert('Login required');
-  const createCheckoutSession = functions.httpsCallable("createCheckoutSession");
-  const session = await createCheckoutSession();
-  stripe.redirectToCheckout({sessionId: session.data.sessionId});
-}
-
-// ---------------- PWA ----------------
-if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js');}
+// ---------------- INIT ----------------
+populatePlanner();
+loadFavorites();
+updateChart();
 </script>
 
 </body>
