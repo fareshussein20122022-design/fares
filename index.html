@@ -155,11 +155,57 @@ const stripe = Stripe("YOUR_STRIPE_PUBLIC_KEY");
 
 // ---------------- MEALS ----------------
 const meals = {
-breakfast:[{name:"Pancakes",image:"https://eggs.ca/wp-content/uploads/2024/06/fluffy-pancakes-1664x832-1.jpg", calories:350, type:"none"},{name:"Omelette",image:"https://images.unsplash.com/photo-1510693206972-df098062cb71", calories:250,type:"vegetarian"}],
-lunch:[{name:"Chicken Sandwich",image:"https://seasonedskilletblog.com/wp-content/uploads/2022/08/spicy-crispy-chicken-sandwich-07.jpg", calories:450,type:"none"}],
-dinner:[{name:"Steak",image:"https://www.allrecipes.com/thmb/OJ28fIFte6Pyg93ML8IM-APbu1Y=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/AR-14554-sirloin-steak-with-garlic-butter-hero-4x3-d12fa79836754fcf850388e4677bbf55.jpg", calories:700,type:"none"}],
-diet:[{name:"Quinoa Salad",image:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDkgWQfaBu9Fp8WzllAzodvVYQi5mScx2maQ&s", calories:320,type:"vegan"}]
-};
+breakfast:[
+{name:"Pancakes",image:"https://eggs.ca/wp-content/uploads/2024/06/fluffy-pancakes-1664x832-1.jpg", calories:350, type:"none"},
+{name:"Omelette",image:"https://images.unsplash.com/photo-1510693206972-df098062cb71", calories:250, type:"vegetarian"},
+{name:"French Toast",image:"https://images.unsplash.com/photo-1484723091739-30a097e8f929", calories:300, type:"vegetarian"},
+{name:"Bagel with Cream Cheese",image:"https://images.unsplash.com/photo-1509440159596-0249088772ff", calories:280, type:"vegetarian"},
+{name:"Fruit Smoothie",image:"https://images.unsplash.com/photo-1497534446932-c925b458314e", calories:180, type:"vegan"},
+{name:"Breakfast Burrito",image:"https://images.unsplash.com/photo-1600891964599-f61ba0e24092", calories:400, type:"none"},
+{name:"Granola Bowl",image:"https://images.unsplash.com/photo-1512621776951-a57141f2eefd", calories:320, type:"vegetarian"},
+{name:"Croissant",image:"https://images.unsplash.com/photo-1509440159596-0249088772ff", calories:300, type:"vegetarian"},
+{name:"Waffles",image:"https://images.unsplash.com/photo-1506084868230-bb9d95c24759", calories:360, type:"vegetarian"},
+{name:"Egg Muffins",image:"https://images.unsplash.com/photo-1495195134817-aeb325a55b65", calories:250, type:"none"}
+],
+
+lunch:[
+{name:"Chicken Sandwich",image:"https://seasonedskilletblog.com/wp-content/uploads/2022/08/spicy-crispy-chicken-sandwich-07.jpg", calories:450, type:"none"},
+{name:"Burger",image:"https://images.unsplash.com/photo-1550547660-d9450f859349", calories:600, type:"none"},
+{name:"Sushi",image:"https://images.unsplash.com/photo-1553621042-f6e147245754", calories:300, type:"none"},
+{name:"Wrap",image:"https://images.unsplash.com/photo-1565299624946-b28f40a0ae38", calories:350, type:"vegetarian"},
+{name:"Fried Rice",image:"https://images.unsplash.com/photo-1604908177522-040f6d5db5f6", calories:400, type:"vegetarian"},
+{name:"Pizza Slice",image:"https://images.unsplash.com/photo-1548365328-8b849e8d2b4c", calories:500, type:"vegetarian"},
+{name:"Chicken Salad",image:"https://images.unsplash.com/photo-1550304943-4f24f54ddde9", calories:320, type:"none"},
+{name:"Tacos",image:"https://images.unsplash.com/photo-1551504734-5ee1c4a1479b", calories:450, type:"none"},
+{name:"Noodles",image:"https://images.unsplash.com/photo-1585032226651-759b368d7246", calories:400, type:"vegetarian"},
+{name:"Falafel Wrap",image:"https://images.unsplash.com/photo-1546069901-eacef0df6022", calories:350, type:"vegan"}
+],
+dinner:[
+{name:"Steak",image:"https://www.allrecipes.com/thmb/OJ28fIFte6Pyg93ML8IM-APbu1Y=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/AR-14554-sirloin-steak-with-garlic-butter-hero-4x3-d12fa79836754fcf850388e4677bbf55.jpg", calories:700, type:"none"},
+{name:"Grilled Chicken",image:"https://images.unsplash.com/photo-1600891964092-4316c288032e", calories:500, type:"none"},
+{name:"Salmon",image:"https://images.unsplash.com/photo-1467003909585-2f8a72700288", calories:450, type:"none"},
+{name:"Pasta Alfredo",image:"https://images.unsplash.com/photo-1525755662778-989d0524087e", calories:600, type:"vegetarian"},
+{name:"BBQ Ribs",image:"https://images.unsplash.com/photo-1555939594-58d7cb561ad1", calories:650, type:"none"},
+{name:"Roasted Vegetables",image:"https://images.unsplash.com/photo-1512621776951-a57141f2eefd", calories:350, type:"vegetarian"},
+{name:"Curry",image:"https://images.unsplash.com/photo-1605478033166-4f02c3d01c9b", calories:400, type:"vegetarian"},
+{name:"Lasagna",image:"https://images.unsplash.com/photo-1603133872878-684f208fb84b", calories:600, type:"vegetarian"},
+{name:"Stuffed Peppers",image:"https://images.unsplash.com/photo-1604908177522-040f6d5db5f6", calories:450, type:"vegetarian"},
+{name:"Chicken Biryani",image:"https://images.unsplash.com/photo-1604908177522-040f6d5db5f6", calories:550, type:"none"}
+],
+
+diet:[
+{name:"Quinoa Salad",image:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDkgWQfaBu9Fp8WzllAzodvVYQi5mScx2maQ&s", calories:320, type:"vegan"},
+{name:"Greek Yogurt Bowl",image:"https://images.unsplash.com/photo-1488477181946-6428a0291777", calories:250, type:"vegetarian"},
+{name:"Oatmeal",image:"https://images.unsplash.com/photo-1517677208171-0bc6725a3e60", calories:200, type:"vegetarian"},
+{name:"Grilled Fish",image:"https://images.unsplash.com/photo-1467003909585-2f8a72700288", calories:400, type:"none"},
+{name:"Vegetable Soup",image:"https://images.unsplash.com/photo-1543353071-10c8ba85a904", calories:180, type:"vegan"},
+{name:"Fruit Salad",image:"https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea", calories:150, type:"vegan"},
+{name:"Chicken & Veg Bowl",image:"https://images.unsplash.com/photo-1600891964092-4316c288032e", calories:350, type:"none"},
+{name:"Lentil Salad",image:"https://images.unsplash.com/photo-1546069901-eacef0df6022", calories:300, type:"vegan"},
+{name:"Zucchini Noodles",image:"https://images.unsplash.com/photo-1525755662778-989d0524087e", calories:250, type:"vegetarian"},
+{name:"Tofu Stir Fry",image:"https://images.unsplash.com/photo-1512621776951-a57141f2eefd", calories:320, type:"vegan"}
+]
+
 let currentMeal = null;
 let gameMeal = null;
 let xp = 0;
