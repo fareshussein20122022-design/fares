@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meal Pro Infinity | Your Ultimate Health Suite</title>
+    <title>Meal Pro Infinity | Official Health Suite</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -32,36 +32,49 @@
             background: var(--glass); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
             border: 1px solid var(--glass-border); border-radius: 30px; padding: 25px;
             box-shadow: 0 20px 50px rgba(0,0,0,0.1); margin-bottom: 20px;
-            animation: floatIn 0.8s ease-out; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: floatIn 0.8s ease-out;
         }
 
         @keyframes floatIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
         .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; }
 
-        /* Progress Visuals */
+        /* ADVANCED WAVE */
+        .bottle { 
+            width: 70px; height: 110px; border: 3px solid rgba(255,255,255,0.2); 
+            margin: 15px auto; border-radius: 15px; overflow: hidden; position: relative; 
+            background: rgba(0, 0, 0, 0.2); box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+        }
+        .wave-wrapper { position: absolute; bottom: 0; width: 100%; height: 0%; transition: height 1.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .wave-layer { position: absolute; width: 200%; height: 200px; bottom: 0; left: -50%; background: var(--water); opacity: 0.6; border-radius: 40%; animation: rotate-wave 5s linear infinite; }
+        .wave-layer.back { opacity: 0.3; animation: rotate-wave 8s linear infinite; bottom: 2px; }
+        .wave-layer.front { opacity: 0.8; filter: drop-shadow(0 0 10px var(--water)); animation: rotate-wave 4s linear infinite; }
+        @keyframes rotate-wave { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* UI ELEMENTS */
         .ring-box { position: relative; width: 140px; height: 140px; margin: auto; }
         .ring-label { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: 800; font-size: 1.2rem; }
-
-        .bottle { width: 60px; height: 100px; border: 3px solid var(--water); margin: 10px auto; border-radius: 10px; overflow: hidden; position: relative; }
-        .wave { position: absolute; bottom: 0; width: 200%; height: 0%; background: var(--water); animation: wave 3s linear infinite; left: -50%; transition: 1s ease; }
-        @keyframes wave { 0% { transform: translateX(0) rotate(0deg); } 100% { transform: translateX(25%) rotate(360deg); } }
-
-        /* Form Elements */
-        input, select { background: var(--glass); border: 1px solid var(--glass-border); padding: 12px; border-radius: 12px; color: var(--text); font-family: inherit; width: 100%; }
+        input, select { background: var(--glass); border: 1px solid var(--glass-border); padding: 12px; border-radius: 12px; color: var(--text); font-family: inherit; width: 100%; margin-bottom: 10px; }
         button { background: linear-gradient(135deg, var(--primary), var(--secondary)); border: none; padding: 15px 25px; border-radius: 15px; color: white; font-weight: 700; cursor: pointer; transition: 0.3s; width: 100%; }
         button:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3); }
 
-        #mealImage { width: 100%; border-radius: 20px; display: none; margin-top: 15px; animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        @keyframes pop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-
+        #mealImage { width: 100%; border-radius: 20px; display: none; margin-top: 15px; }
         .xp-bar { height: 10px; background: rgba(0,0,0,0.1); border-radius: 10px; overflow: hidden; margin-top: 10px; }
         .xp-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--secondary)); transition: 0.5s; }
+
+        #toast { 
+            position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%);
+            background: var(--glass); backdrop-filter: blur(20px); border: 1px solid var(--accent);
+            padding: 15px 30px; border-radius: 50px; color: white; font-weight: 600;
+            transition: 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55); z-index: 1000;
+        }
+        #toast.active { bottom: 40px; }
     </style>
 </head>
 <body class="dark-mode">
 
 <canvas id="particleCanvas"></canvas>
+<div id="toast">LEVEL UP! 🚀</div>
 
 <div class="container">
     <header style="display: flex; justify-content: space-between; align-items: center; padding: 20px 0;">
@@ -71,36 +84,42 @@
 
     <div class="dashboard-grid">
         <div class="glass-card" style="text-align: center;">
-            <h3 style="margin-top:0;">Nutrition</h3>
+            <h3>Nutrition</h3>
             <div class="ring-box"><canvas id="ringChart"></canvas><div class="ring-label" id="calPerc">0%</div></div>
-            <p><span id="cals">0</span> / <span id="goal">2000</span> kcal</p>
+            <p><span id="cals">0</span> / <span id="goalDisplay">2000</span> kcal</p>
         </div>
 
         <div class="glass-card" style="text-align: center;">
-            <h3 style="margin-top:0;">Hydration</h3>
-            <div class="bottle"><div id="waterLevel" class="wave"></div></div>
+            <h3>Hydration</h3>
+            <div class="bottle">
+                <div id="waterWrapper" class="wave-wrapper">
+                    <div class="wave-layer back"></div>
+                    <div class="wave-layer"></div>
+                    <div class="wave-layer front"></div>
+                </div>
+            </div>
             <p><span id="waterCount">0</span>/8 Glasses</p>
             <button onclick="addWater()">+ Drink</button>
         </div>
 
         <div class="glass-card">
-            <h3 style="margin:0; opacity: 0.6; font-size: 0.8rem;">CURRENT STATUS</h3>
-            <h2 style="margin: 5px 0; color: var(--accent);">LVL <span id="lvl">1</span> — <span id="rank">Rookie</span></h2>
-            <p style="margin:0;">XP: <span id="xp">0</span></p>
+            <h3>STATUS</h3>
+            <h2 style="color: var(--accent); margin: 5px 0;">LVL <span id="lvl">1</span> — <span id="rank">Rookie</span></h2>
             <div class="xp-bar"><div id="xpFill" class="xp-fill"></div></div>
+            <p style="margin: 10px 0 0; font-size: 0.8rem; opacity: 0.7;">XP: <span id="xpText">0</span></p>
             <button onclick="resetDay()" style="margin-top: 15px; background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid #ef4444;">Reset Day</button>
         </div>
     </div>
 
     <div class="glass-card">
         <h3>👤 Profile & BMR Settings</h3>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
             <input type="number" id="uWeight" placeholder="Weight (kg)">
             <input type="number" id="uHeight" placeholder="Height (cm)">
             <input type="number" id="uAge" placeholder="Age">
             <select id="uGoal">
-                <option value="lose">Lose Weight</option>
                 <option value="maintain">Maintain</option>
+                <option value="lose">Lose Weight</option>
                 <option value="gain">Gain Muscle</option>
             </select>
         </div>
@@ -114,6 +133,7 @@
                 <option value="breakfast">Breakfast</option>
                 <option value="lunch">Lunch</option>
                 <option value="dinner">Dinner</option>
+                <option value="balanced">Balanced Nutrition</option>
             </select>
             <button onclick="getMeal()" style="flex: 1;">Generate</button>
         </div>
@@ -126,22 +146,22 @@
 </div>
 
 <script>
-// --- DATABASE (40+ Meals) ---
+// --- FULL MEAL DATABASE (RESTORED) ---
 const meals = {
     breakfast: [
         {n:"Avocado Toast", c:320, p:8, cb:35, f:15, img:"https://images.unsplash.com/photo-1525351484163-7529414344d8?w=500"},
+        {n:"Protein Pancakes", c:400, p:25, cb:45, f:10, img:"https://images.unsplash.com/photo-1528207776546-365bb710ee93?w=500"},
         {n:"Greek Yogurt Bowl", c:250, p:20, cb:25, f:5, img:"https://images.unsplash.com/photo-1488477181946-6428a0291777?w=500"},
         {n:"Oatmeal & Berries", c:300, p:10, cb:50, f:6, img:"https://images.unsplash.com/photo-1517673132405-a56a62b18caf?w=500"},
-        {n:"Protein Pancakes", c:400, p:25, cb:45, f:10, img:"https://images.unsplash.com/photo-1528207776546-365bb710ee93?w=500"},
         {n:"Spinach Omelette", c:280, p:18, cb:4, f:22, img:"https://images.unsplash.com/photo-1510693206972-df098062cb71?w=500"},
         {n:"Breakfast Burrito", c:550, p:22, cb:60, f:25, img:"https://images.unsplash.com/photo-1589135398302-388cd356794f?w=500"},
-        {n:"Chia Seed Pudding", c:220, p:8, cb:20, f:12, img:"https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500"},
         {n:"Smoothie Bowl", c:350, p:12, cb:65, f:8, img:"https://images.unsplash.com/photo-1494390248081-4e521a5940db?w=500"},
-        {n:"Egg & Cheese Bagel", c:480, p:20, cb:55, f:18, img:"https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=500"},
-        {n:"Fruit Salad & Nuts", c:210, p:5, cb:30, f:12, img:"https://images.unsplash.com/photo-1490818387583-1baba5e638af?w=500"}
+        {n:"Chia Pudding", c:220, p:8, cb:20, f:12, img:"https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500"},
+        {n:"Egg Bagel", c:480, p:20, cb:55, f:18, img:"https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=500"},
+        {n:"Fruit & Nut Plate", c:210, p:5, cb:30, f:12, img:"https://images.unsplash.com/photo-1490818387583-1baba5e638af?w=500"}
     ],
     lunch: [
-        {n:"Quinoa Salad", c:380, p:12, cb:55, f:14, img:"https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500"},
+        {n:"Quinoa Bowl", c:380, p:12, cb:55, f:14, img:"https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500"},
         {n:"Chicken Wrap", c:420, p:35, cb:40, f:15, img:"https://images.unsplash.com/photo-1626700051175-6818013e1d4f?w=500"},
         {n:"Tuna Melt", c:510, p:30, cb:45, f:22, img:"https://images.unsplash.com/photo-1525351326368-efbb5cb6814d?w=500"},
         {n:"Turkey Club", c:580, p:32, cb:50, f:28, img:"https://images.unsplash.com/photo-1524339939944-12c6104f0abc?w=500"},
@@ -150,59 +170,76 @@ const meals = {
         {n:"Chicken Caesar", c:450, p:30, cb:15, f:30, img:"https://images.unsplash.com/photo-1512852939750-1305098529bf?w=500"},
         {n:"Caprese Panini", c:410, p:15, cb:48, f:18, img:"https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=500"},
         {n:"Miso Ramen", c:520, p:20, cb:70, f:18, img:"https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=500"},
-        {n:"Hummus Veggie Plate", c:350, p:14, cb:40, f:16, img:"https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=500"}
+        {n:"Hummus Plate", c:350, p:14, cb:40, f:16, img:"https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=500"}
     ],
     dinner: [
         {n:"Grilled Salmon", c:520, p:40, cb:5, f:35, img:"https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=500"},
-        {n:"Steak & Broccoli", c:680, p:55, cb:10, f:45, img:"https://images.unsplash.com/photo-1544025162-d76694265947?w=500"},
+        {n:"Steak & Veggies", c:680, p:55, cb:10, f:45, img:"https://images.unsplash.com/photo-1544025162-d76694265947?w=500"},
         {n:"Shrimp Pasta", c:610, p:30, cb:75, f:20, img:"https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=500"},
         {n:"Stuffed Peppers", c:430, p:25, cb:40, f:18, img:"https://images.unsplash.com/photo-1590412200988-a436bb7050a8?w=500"},
         {n:"Chicken Stir-Fry", c:480, p:35, cb:45, f:12, img:"https://images.unsplash.com/photo-1512058564366-18510be2db19?w=500"},
         {n:"Lamb Chops", c:750, p:45, cb:0, f:60, img:"https://images.unsplash.com/photo-1603048297172-c92544798d5a?w=500"},
-        {n:"Vegetable Curry", c:390, p:12, cb:60, f:15, img:"https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=500"},
+        {n:"Veggie Curry", c:390, p:12, cb:60, f:15, img:"https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=500"},
         {n:"Fish Tacos", c:540, p:28, cb:55, f:22, img:"https://images.unsplash.com/photo-1512838243191-e81e8f66f1fd?w=500"},
         {n:"Baked Tofu Bowl", c:360, p:24, cb:35, f:14, img:"https://images.unsplash.com/photo-1546069901-e51626a3d937?w=500"},
         {n:"Roasted Chicken", c:620, p:48, cb:15, f:40, img:"https://images.unsplash.com/photo-1532550907401-a500c9a57435?w=500"}
+    ],
+    balanced: [
+        {n:"Buddha Bowl", c:450, p:18, cb:55, f:16, img:"https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500"},
+        {n:"Mediterranean Plate", c:500, p:22, cb:45, f:25, img:"https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=500"},
+        {n:"Veggie Frittata", c:320, p:16, cb:10, f:22, img:"https://images.unsplash.com/photo-1510693206972-df098062cb71?w=500"},
+        {n:"Nicoise Salad", c:410, p:25, cb:20, f:28, img:"https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500"},
+        {n:"Stuffed Sweet Potato", c:380, p:12, cb:65, f:10, img:"https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=500"},
+        {n:"Minestrone Soup", c:280, p:14, cb:40, f:8, img:"https://images.unsplash.com/photo-1547592166-23ac45744acd?w=500"},
+        {n:"Turkey Avocado Salad", c:440, p:30, cb:15, f:32, img:"https://images.unsplash.com/photo-1512852939750-1305098529bf?w=500"},
+        {n:"Veggie Pasta", c:460, p:14, cb:70, f:12, img:"https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=500"},
+        {n:"Tofu Stir-Fry", c:390, p:22, cb:35, f:18, img:"https://images.unsplash.com/photo-1546069901-e51626a3d937?w=500"},
+        {n:"Apple Walnut Salad", c:310, p:8, cb:30, f:20, img:"https://images.unsplash.com/photo-1490818387583-1baba5e638af?w=500"}
     ]
 };
 
-// --- CORE APP LOGIC ---
+// --- CORE LOGIC ---
 let data = JSON.parse(localStorage.getItem('mealInfinityOfficial')) || { 
-    xp: 0, cals: 0, water: 0, weight: 70, height: 175, age: 25, goal: 2000, theme: 'dark' 
+    xp: 0, cals: 0, water: 0, goal: 2000, theme: 'dark', lvl: 1 
 };
-
 let ringChart, macroChart;
 
-// Particle Background
+// Particle System
 const canvas = document.getElementById('particleCanvas');
 const ctx = canvas.getContext('2d');
 let pts = [];
+const colors = ['#3b82f6', '#10b981', '#fbbf24', '#ef4444'];
 function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
 window.onresize = resize; resize();
 
 class Pt {
-    constructor() { this.x = Math.random()*canvas.width; this.y = Math.random()*canvas.height; this.s = Math.random()*2; this.vx = Math.random()-0.5; this.vy = Math.random()-0.5; }
-    draw() { ctx.fillStyle = data.theme==='dark'?'#fff':'#6366f1'; ctx.globalAlpha = 0.2; ctx.beginPath(); ctx.arc(this.x,this.y,this.s,0,Math.PI*2); ctx.fill(); }
-    move() { this.x+=this.vx; this.y+=this.vy; if(this.x<0||this.x>canvas.width) this.vx*=-1; if(this.y<0||this.y>canvas.height) this.vy*=-1; }
+    constructor() { this.reset(); }
+    reset() { this.x = Math.random()*canvas.width; this.y = Math.random()*canvas.height; this.s = Math.random()*2; this.vx = (Math.random()-0.5)*0.5; this.vy = (Math.random()-0.5)*0.5; this.c = colors[Math.floor(Math.random()*colors.length)]; }
+    update() { this.x+=this.vx; this.y+=this.vy; if(this.x<0||this.x>canvas.width||this.y<0||this.y>canvas.height) this.reset(); }
+    draw() { ctx.fillStyle = this.c; ctx.globalAlpha = 0.2; ctx.beginPath(); ctx.arc(this.x,this.y,this.s,0,Math.PI*2); ctx.fill(); }
 }
-for(let i=0;i<60;i++) pts.push(new Pt());
-function anim() { ctx.clearRect(0,0,canvas.width,canvas.height); pts.forEach(p=>{p.move();p.draw();}); requestAnimationFrame(anim); }
+for(let i=0; i<80; i++) pts.push(new Pt());
+function anim() { ctx.clearRect(0,0,canvas.width,canvas.height); pts.forEach(p=>{p.update();p.draw();}); requestAnimationFrame(anim); }
 anim();
 
 // App Functions
+function save() { localStorage.setItem('mealInfinityOfficial', JSON.stringify(data)); }
+function showToast(msg) { const t = document.getElementById('toast'); t.innerText = msg; t.classList.add('active'); setTimeout(()=>t.classList.remove('active'), 3000); }
 function toggleTheme() { data.theme = data.theme==='dark'?'light':'dark'; document.body.className = data.theme+"-mode"; save(); }
 
 function updateUI() {
     document.getElementById('cals').innerText = data.cals;
+    document.getElementById('goalDisplay').innerText = data.goal;
     document.getElementById('waterCount').innerText = data.water;
-    document.getElementById('waterLevel').style.height = (data.water/8*100)+"%";
-    document.getElementById('xp').innerText = Math.round(data.xp);
-    document.getElementById('lvl').innerText = Math.floor(data.xp/500)+1;
-    document.getElementById('xpFill').style.width = (data.xp%500/5)+"%";
+    document.getElementById('waterWrapper').style.height = (data.water/8*100)+"%";
+    document.getElementById('xpText').innerText = Math.floor(data.xp);
     
-    let perc = Math.min(Math.round((data.cals/data.goal)*100), 100);
-    document.getElementById('calPerc').innerText = perc+"%";
+    let newLvl = Math.floor(data.xp/500) + 1;
+    if(newLvl > data.lvl) { data.lvl = newLvl; showToast(`LEVEL UP! LVL ${data.lvl} 🚀`); }
+    document.getElementById('lvl').innerText = data.lvl;
+    document.getElementById('xpFill').style.width = (data.xp % 500 / 5) + "%";
     
+    document.getElementById('calPerc').innerText = Math.min(Math.round((data.cals/data.goal)*100), 100)+"%";
     const ranks = ["Rookie", "Novice", "Expert", "Elite", "Legend"];
     document.getElementById('rank').innerText = ranks[Math.min(Math.floor(data.xp/1500), 4)];
     
@@ -210,59 +247,35 @@ function updateUI() {
 }
 
 function calcBMR() {
-    const w = parseFloat(document.getElementById('uWeight').value)||data.weight;
-    const h = parseFloat(document.getElementById('uHeight').value)||data.height;
-    const a = parseInt(document.getElementById('uAge').value)||data.age;
-    const g = document.getElementById('uGoal').value;
-    
-    let bmr = (10*w)+(6.25*h)-(5*a)+5;
-    if(g==='lose') data.goal = Math.round(bmr*1.2-500);
-    else if(g==='gain') data.goal = Math.round(bmr*1.5);
-    else data.goal = Math.round(bmr*1.3);
-
-    data.weight=w; data.height=h; data.age=a; save(); updateUI();
-    alert("Profile Updated! Target: " + data.goal + " kcal");
+    const w = parseFloat(document.getElementById('uWeight').value)||70, h = parseFloat(document.getElementById('uHeight').value)||170, a = parseInt(document.getElementById('uAge').value)||25, g = document.getElementById('uGoal').value;
+    let b = (10*w)+(6.25*h)-(5*a)+5;
+    data.goal = (g==='lose')?Math.round(b*1.1):(g==='gain')?Math.round(b*1.6):Math.round(b*1.3);
+    save(); updateUI();
 }
 
-function addWater() { if(data.water<8) { data.water++; data.xp+=20; updateUI(); save(); } }
+function addWater() { if(data.water<8) { data.water++; data.xp+=25; updateUI(); save(); } }
 
 function getMeal() {
-    const type = document.getElementById('mType').value;
-    const pool = meals[type];
+    const pool = meals[document.getElementById('mType').value];
     const meal = pool[Math.floor(Math.random()*pool.length)];
-    
     document.getElementById('mName').innerText = meal.n;
-    const img = document.getElementById('mealImage');
-    img.src = meal.img; img.style.display = 'block';
-    
-    macroChart.data.datasets[0].data = [meal.p, meal.cb, meal.f];
-    macroChart.update();
-
-    data.cals += meal.c; data.xp += 50; updateUI(); save();
-}
-
-function initCharts() {
-    const rCtx = document.getElementById('ringChart').getContext('2d');
-    ringChart = new Chart(rCtx, {
-        type: 'doughnut',
-        data: { datasets: [{ data: [0, 2000], backgroundColor: ['#6366f1', 'rgba(100,100,100,0.1)'], borderWidth: 0 }] },
-        options: { cutout: '85%', plugins: { legend: { display: false } } }
-    });
-
-    const mCtx = document.getElementById('macroChart').getContext('2d');
-    macroChart = new Chart(mCtx, {
-        type: 'pie',
-        data: { labels: ['P', 'C', 'F'], datasets: [{ data: [1,1,1], backgroundColor: ['#f43f5e', '#6366f1', '#fbbf24'] }] },
-        options: { plugins: { legend: { position: 'bottom', labels: { color: data.theme==='dark'?'#fff':'#000' } } } }
-    });
+    const img = document.getElementById('mealImage'); img.src = meal.img; img.style.display = 'block';
+    macroChart.data.datasets[0].data = [meal.p, meal.cb, meal.f]; macroChart.update();
+    data.cals += meal.c; data.xp += 100; updateUI(); save();
 }
 
 function resetDay() { data.cals = 0; data.water = 0; save(); updateUI(); }
-function save() { localStorage.setItem('mealInfinityOfficial', JSON.stringify(data)); }
 
 window.onload = () => {
     document.body.className = data.theme+"-mode";
-    initCharts();
+    ringChart = new Chart(document.getElementById('ringChart').getContext('2d'), {
+        type: 'doughnut', data: { datasets: [{ data: [0, 2000], backgroundColor: ['#6366f1', 'rgba(100,100,100,0.1)'], borderWidth: 0 }] },
+        options: { cutout: '85%', plugins: { legend: { display: false } } }
+    });
+    macroChart = new Chart(document.getElementById('macroChart').getContext('2d'), {
+        type: 'pie', data: { labels: ['P', 'C', 'F'], datasets: [{ data: [1,1,1], backgroundColor: ['#f43f5e', '#6366f1', '#fbbf24'] }] },
+        options: { plugins: { legend: { position: 'bottom' } } }
+    });
     updateUI();
 };
 </script>
