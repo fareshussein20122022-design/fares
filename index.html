@@ -3,55 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meal Pro Infinity | Official Health Suite</title>
+    <title>Meal Pro Infinity | Ultimate Health Suite</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --primary: #6366f1; --secondary: #a855f7; --accent: #00d2ff;
             --water: #3b82f6; --bg: #0f172a; --text: #f1f5f9;
-            --glass: rgba(255, 255, 255, 0.03); --glass-border: rgba(255, 255, 255, 0.1);
+            --glass: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.1);
         }
-        .light-mode { --bg: #f8fafc; --text: #1e293b; --glass: rgba(255, 255, 255, 0.6); --glass-border: rgba(0, 0, 0, 0.05); }
-        .neon-mode { --bg: #050505; --text: #00ff41; --primary: #00ff41; --secondary: #008f11; --glass: rgba(0, 255, 65, 0.05); --glass-border: #00ff41; }
-
+        .light-mode { --bg: #f8fafc; --text: #1e293b; --glass: rgba(255, 255, 255, 0.6); --glass-border: rgba(0, 0, 0, 0.1); }
+        
         body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 10px; transition: all 0.5s ease; min-height: 100vh; overflow-x: hidden; }
         #particleCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
-        .container { max-width: 1100px; margin: auto; position: relative; z-index: 1; padding: 10px; }
+        .container { max-width: 1200px; margin: auto; position: relative; z-index: 1; padding: 10px; }
 
         .glass-card { 
-            background: var(--glass); backdrop-filter: blur(25px); border: 1px solid var(--glass-border); 
-            border-radius: 30px; padding: 25px; margin-bottom: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            background: var(--glass); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); 
+            border-radius: 30px; padding: 25px; margin-bottom: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.2);
             transition: transform 0.3s ease;
         }
         .glass-card:hover { transform: translateY(-5px); }
         
-        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; }
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
 
-        /* WATER ANIMATION */
-        .bottle { width: 60px; height: 100px; border: 3px solid rgba(255,255,255,0.2); margin: 15px auto; border-radius: 12px; overflow: hidden; position: relative; background: rgba(0, 0, 0, 0.2); }
-        .wave-wrapper { position: absolute; bottom: 0; width: 100%; height: 0%; transition: height 1s cubic-bezier(0.175, 0.885, 0.32, 1.275); background: var(--water); box-shadow: 0 0 20px var(--water); }
+        /* HD MEAL VIEWER (16:9) */
+        .meal-image-container {
+            width: 100%; margin-top: 20px; border-radius: 20px; overflow: hidden; display: none;
+            border: 2px solid var(--glass-border); aspect-ratio: 16 / 9; background: #000;
+        }
+        #mealImage { width: 100%; height: 100%; object-fit: cover; filter: brightness(1.1); transition: 0.6s ease; }
+
+        /* WATER UI */
+        .bottle { width: 65px; height: 105px; border: 3px solid rgba(255,255,255,0.2); margin: 15px auto; border-radius: 15px; overflow: hidden; position: relative; background: rgba(0, 0, 0, 0.3); }
+        .wave-wrapper { position: absolute; bottom: 0; width: 100%; height: 0%; transition: height 1s cubic-bezier(0.4, 0, 0.2, 1); background: var(--water); box-shadow: 0 0 25px var(--water); }
         
-        input, select, button { border-radius: 15px; padding: 12px; font-family: inherit; margin-bottom: 10px; width: 100%; border: none; }
+        /* INPUTS & BUTTONS */
+        input, select, button { border-radius: 15px; padding: 12px; font-family: inherit; margin-bottom: 12px; width: 100%; border: none; outline: none; }
         select, input { background: var(--glass); color: var(--text); border: 1px solid var(--glass-border); }
         button { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; font-weight: 700; cursor: pointer; transition: 0.3s; }
-        button:active { transform: scale(0.95); }
-        
-        #mealImage { width: 100%; border-radius: 20px; display: none; margin-top: 15px; max-height: 250px; object-fit: cover; border: 1px solid var(--glass-border); }
-        
-        /* PROGRESS UI */
-        .xp-bar { height: 12px; background: rgba(0,0,0,0.2); border-radius: 10px; overflow: hidden; margin-top: 10px; border: 1px solid var(--glass-border); }
-        .xp-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--secondary)); transition: 0.8s ease; width: 0%; }
-        
-        #stepsContainer, #shopListContainer { display: none; text-align: left; margin-top: 15px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 20px; font-size: 0.9rem; border: 1px solid var(--glass-border); }
-        
-        .badge-grid { display: flex; gap: 10px; margin-top: 10px; justify-content: center; }
-        .badge { width: 40px; height: 40px; background: var(--glass); border-radius: 50%; display: flex; align-items: center; justify-content: center; opacity: 0.2; grayscale: 1; transition: 0.5s; font-size: 1.2rem; }
-        .badge.active { opacity: 1; grayscale: 0; background: var(--secondary); box-shadow: 0 0 15px var(--secondary); }
+        button:hover { filter: brightness(1.2); transform: scale(1.02); }
+        button:active { transform: scale(0.98); }
 
-        #toast { position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%); background: var(--primary); padding: 15px 30px; border-radius: 50px; color: white; transition: 0.5s; z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        /* XP PROGRESS */
+        .xp-bar { height: 14px; background: rgba(0,0,0,0.3); border-radius: 20px; overflow: hidden; margin-top: 10px; border: 1px solid var(--glass-border); }
+        .xp-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--secondary)); transition: 1s ease; width: 0%; }
+        
+        #stepsContainer, #shopListContainer { display: none; text-align: left; margin-top: 15px; padding: 18px; background: rgba(0,0,0,0.2); border-radius: 20px; font-size: 0.95rem; line-height: 1.6; border: 1px solid var(--glass-border); }
+        #toast { position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%); background: var(--primary); padding: 15px 40px; border-radius: 50px; color: white; transition: 0.5s; z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); font-weight: bold; }
         #toast.active { bottom: 40px; }
-        .chart-container { width: 160px; height: 160px; margin: auto; }
+        .chart-container { width: 170px; height: 170px; margin: auto; }
     </style>
 </head>
 <body class="dark-mode">
@@ -60,12 +61,12 @@
 <div id="toast">LEVEL UP! 🚀</div>
 
 <div class="container">
-    <header style="display: flex; justify-content: space-between; align-items: center; padding: 20px 0;">
-        <h1 style="margin:0; font-weight: 800; letter-spacing: -3px; font-size: 2.5rem;">MEAL<span style="color: var(--primary)">PRO</span></h1>
-        <div style="display: flex; gap: 8px;">
-            <button onclick="toggleTheme()" style="width: auto; padding: 10px 15px;">🌓</button>
-            <button id="neonBtn" onclick="toggleNeon()" style="width: auto; padding: 10px 15px; display: none;">🟢</button>
-            <button onclick="clearData()" style="width: auto; padding: 10px 15px; background: #ef4444;">🗑️</button>
+    <header style="display: flex; justify-content: space-between; align-items: center; padding: 25px 0;">
+        <h1 style="margin:0; font-weight: 800; letter-spacing: -3px; font-size: 2.8rem;">MEAL<span style="color: var(--primary)">PRO</span></h1>
+        <div style="display: flex; gap: 10px;">
+            <button onclick="toggleTheme()" style="width: auto; padding: 10px 18px;">🌓</button>
+            <button onclick="resetDay()" style="width: auto; padding: 10px 18px; background: #f59e0b;">☀️ New Day</button>
+            <button onclick="clearAllData()" style="width: auto; padding: 10px 18px; background: #ef4444;">🗑️ Reset</button>
         </div>
     </header>
 
@@ -73,107 +74,95 @@
         <div class="glass-card" style="text-align: center;">
             <h3 style="margin-top:0">Goal Progress</h3>
             <div class="chart-container"><canvas id="goalChart"></canvas></div>
-            <p style="font-weight: 600; margin-top: 10px;"><span id="cals">0</span> / 2000 kcal</p>
+            <p style="font-weight: 600; margin-top: 15px;"><span id="cals">0</span> / 2000 kcal</p>
         </div>
 
         <div class="glass-card" style="text-align: center;">
             <h3 style="margin-top:0">Hydration</h3>
             <div class="bottle"><div id="waterWrapper" class="wave-wrapper"></div></div>
             <p><span id="waterCount">0</span>/8 glasses</p>
-            <button onclick="addWater()">+ Drink Water</button>
+            <button onclick="addWater()">+ Drink Glass</button>
         </div>
 
         <div class="glass-card">
             <h3 style="margin-top:0">Rank: <span id="rank">Rookie</span></h3>
-            <h2 style="margin: 5px 0; font-weight: 800; color: var(--accent);">LVL <span id="lvl">1</span></h2>
+            <h2 style="margin: 5px 0; font-weight: 800; color: var(--accent); font-size: 2rem;">LVL <span id="lvl">1</span></h2>
             <div class="xp-bar"><div id="xpFill" class="xp-fill"></div></div>
-            <p style="font-size: 0.8rem; margin-top: 8px; opacity: 0.8;">XP: <span id="xpText">0</span>/100</p>
-            <div class="badge-grid">
-                <div id="badge-1" class="badge" title="Hydrated">💧</div>
-                <div id="badge-2" class="badge" title="Healthy Eater">🥗</div>
-                <div id="badge-3" class="badge" title="Goal Setter">🔥</div>
-            </div>
+            <p style="font-size: 0.85rem; margin-top: 10px; opacity: 0.8;">XP: <span id="xpText">0</span>/100</p>
         </div>
     </div>
 
-    <div class="glass-card">
-        <h3>🍳 Smart Meal Generator</h3>
-        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-            <select id="mType" style="flex: 2; margin:0">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
+        <div class="glass-card">
+            <h3>🍳 Smart Generator</h3>
+            <select id="mType">
                 <option value="breakfast">Breakfast</option>
                 <option value="lunch">Lunch</option>
                 <option value="dinner">Dinner</option>
                 <option value="balanced">Balanced (Full Meals)</option>
             </select>
-            <button onclick="getMeal()" style="flex: 1; margin:0">Generate</button>
+            <button onclick="getMeal()">Generate Ideas</button>
+            <div id="mDisplay" style="text-align: center;">
+                <h4 id="mName" style="margin: 15px 0; font-size: 1.2rem;"></h4>
+                <div class="meal-image-container" id="imgCont"><img id="mealImage" src=""></div>
+                <button id="stepBtn" onclick="toggleSteps()" style="display:none; margin-top:20px; background:none; border:1px solid var(--primary); font-size:0.8rem; width: auto; padding: 8px 25px;">View Recipe</button>
+                <div id="stepsContainer"></div>
+            </div>
         </div>
-        <div id="mDisplay" style="text-align: center;">
-            <h2 id="mName" style="margin-bottom: 10px;"></h2>
-            <img id="mealImage">
-            <button id="stepBtn" onclick="toggleSteps()" style="display:none; margin-top:15px; background:none; border:1px solid var(--primary); font-size:0.8rem; width: auto; padding: 8px 20px;">Show Recipe</button>
-            <div id="stepsContainer"></div>
+
+        <div class="glass-card">
+            <h3>➕ Quick Log</h3>
+            <p style="font-size: 0.85rem; opacity: 0.7; margin-bottom: 15px;">Track custom snacks or meals manually.</p>
+            <input type="text" id="customName" placeholder="What did you eat?">
+            <input type="number" id="customCals" placeholder="Calories (e.g. 300)">
+            <button onclick="addCustomMeal()" style="background: var(--accent); color: #000;">Add to Daily Total</button>
         </div>
     </div>
 
     <div class="glass-card">
         <h3>🛒 Smart Shopping List</h3>
-        <p style="font-size: 0.8rem; opacity: 0.7;">Ingredients from your generated meals:</p>
         <div id="shopListContainer" style="display: block;">
-            <ul id="shoppingItems" style="padding-left: 20px; margin: 0;">
+            <ul id="shoppingItems" style="padding-left: 20px;">
                 <li style="opacity:0.5">Generate a meal to build your list...</li>
             </ul>
         </div>
-        <button onclick="clearShopList()" style="margin-top: 15px; background: rgba(255,255,255,0.05); color: var(--text); border: 1px solid var(--glass-border); font-size: 0.8rem;">Clear List</button>
+        <button onclick="clearShopList()" style="margin-top: 15px; background: rgba(255,255,255,0.05); color: var(--text); border: 1px solid var(--glass-border); width: auto; padding: 10px 25px;">Clear Items</button>
     </div>
 </div>
 
 <script>
-    // --- COMPREHENSIVE MEAL DATABASE ---
+    // --- FULL DATABASE RESTORED ---
     const meals = {
         breakfast: [
-            {n:"Avocado Toast", c:320, ing:["Bread", "Avocado", "Chili Flakes"], img:"https://images.unsplash.com/photo-1525351484163-7529414344d8?w=500", steps: ["Toast bread.", "Mash avocado with salt/pepper.", "Top with chili flakes."]},
-            {n:"Protein Pancakes", c:420, ing:["Oats", "Protein Powder", "Egg"], img:"https://images.unsplash.com/photo-1567620905732-2d1ec7bb7445?w=500", steps: ["Mix oats, powder, and egg.", "Cook on pan 2 mins per side.", "Top with berries."]},
-            {n:"Shakshuka", c:350, ing:["Eggs", "Tomatoes", "Cumin", "Onion"], img:"https://images.unsplash.com/photo-1590412200988-a436bb7050a8?w=500", steps: ["Sauté onions/spices.", "Add tomatoes and simmer.", "Crack eggs in and cover until set."]}
+            {n:"Avocado Toast & Egg", c:320, ing:["Sourdough", "Avocado", "Egg"], img:"https://images.unsplash.com/photo-1525351484163-7529414344d8?w=1200", steps:["Toast bread.", "Mash avocado with salt.", "Top with fried egg."]},
+            {n:"Protein Oat Bowl", c:410, ing:["Oats", "Whey Protein", "Berries"], img:"https://images.unsplash.com/photo-1517673400267-0251440c45dc?w=1200", steps:["Boil oats.", "Stir in protein.", "Top with berries."]}
         ],
         lunch: [
-            {n:"Quinoa Bowl", c:450, ing:["Quinoa", "Cucumber", "Feta", "Lemon"], img:"https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500", steps: ["Boil quinoa.", "Chop cucumber and feta.", "Toss with lemon and oil."]},
-            {n:"Chicken Wrap", c:550, ing:["Tortilla", "Chicken Breast", "Spinach"], img:"https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=500", steps: ["Grill chicken.", "Assemble with spinach in tortilla.", "Roll tightly."]}
+            {n:"Grilled Chicken Wrap", c:550, ing:["Tortilla", "Chicken", "Spinach"], img:"https://images.unsplash.com/photo-1626700051175-6818013e1d4f?w=1200", steps:["Grill chicken.", "Spread sauce on wrap.", "Roll with spinach."]},
+            {n:"Quinoa Med-Bowl", c:480, ing:["Quinoa", "Cucumber", "Feta"], img:"https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=1200", steps:["Mix cooked quinoa.", "Add diced veggies.", "Toss with lemon oil."]}
         ],
         dinner: [
-            {n:"Salmon & Asparagus", c:500, ing:["Salmon", "Asparagus", "Lemon"], img:"https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=500", steps: ["Season salmon.", "Roast with asparagus at 200°C.", "Serve with lemon."]},
-            {n:"Beef Stir-fry", c:600, ing:["Beef Strips", "Broccoli", "Soy Sauce", "Rice"], img:"https://images.unsplash.com/photo-1512058560566-d8d437af2d36?w=500", steps: ["Sauté beef.", "Add broccoli and soy sauce.", "Serve over rice."]}
+            {n:"Honey Salmon", c:520, ing:["Salmon", "Asparagus", "Honey"], img:"https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=1200", steps:["Glaze salmon with honey.", "Bake with asparagus.", "12 mins at 200°C."]}
         ],
         balanced: [
-            {n:"Steak & Sweet Potato", c:680, ing:["Steak", "Sweet Potato", "Kale"], img:"https://images.unsplash.com/photo-1546964124-0cce460f38ef?w=500", steps: ["Bake sweet potato.", "Sear steak 4 mins per side.", "Sauté kale."]},
-            {n:"Mediterranean Bowl", c:610, ing:["Hummus", "Falafel", "Rice", "Olives"], img:"https://images.unsplash.com/photo-1543339308-43e59d6b73a6?w=500", steps: ["Base of rice.", "Add hummus, falafel, and olives.", "Top with tahini."]}
+            {n:"Steak & Sweet Potato", c:680, ing:["Steak", "Sweet Potato", "Broccoli"], img:"https://images.unsplash.com/photo-1546964124-0cce460f38ef?w=1200", steps:["Roast sweet potato cubes.", "Sear steak 4 mins per side.", "Steam broccoli."]}
         ]
     };
 
-    // --- APP STATE & PERSISTENCE ---
-    let state = JSON.parse(localStorage.getItem('mealProData')) || {
-        cals: 0, water: 0, xp: 0, lvl: 1, goal: 2000, shopping: []
+    // --- APP LOGIC ---
+    let state = JSON.parse(localStorage.getItem('mealProFinalData')) || {
+        cals: 0, water: 0, xp: 0, lvl: 1, shopping: []
     };
 
     let goalChart;
 
-    function save() {
-        localStorage.setItem('mealProData', JSON.stringify(state));
-        updateUI();
-    }
+    function save() { localStorage.setItem('mealProFinalData', JSON.stringify(state)); updateUI(); }
 
-    // --- UI UPDATES ---
     function initChart() {
         const ctx = document.getElementById('goalChart').getContext('2d');
         goalChart = new Chart(ctx, {
             type: 'doughnut',
-            data: {
-                datasets: [{
-                    data: [state.cals, Math.max(0, state.goal - state.cals)],
-                    backgroundColor: ['#6366f1', 'rgba(255,255,255,0.05)'],
-                    borderWidth: 0,
-                    hoverOffset: 4
-                }]
-            },
+            data: { datasets: [{ data: [state.cals, Math.max(0, 2000 - state.cals)], backgroundColor: ['#6366f1', 'rgba(255,255,255,0.05)'], borderWidth: 0 }] },
             options: { cutout: '85%', plugins: { tooltip: { enabled: false } } }
         });
     }
@@ -185,104 +174,113 @@
         document.getElementById('lvl').innerText = state.lvl;
         document.getElementById('xpText').innerText = state.xp;
         document.getElementById('xpFill').style.width = state.xp + '%';
+        document.getElementById('rank').innerText = state.lvl > 5 ? "Elite Athlete" : "Rookie";
         
-        // Rank & Neon Toggle
-        document.getElementById('rank').innerText = state.lvl > 5 ? "Athlete" : "Rookie";
-        if(state.lvl >= 3) document.getElementById('neonBtn').style.display = "inline-block";
-
-        // Badges
-        if(state.water >= 8) document.getElementById('badge-1').classList.add('active');
-        if(state.cals > 1000) document.getElementById('badge-2').classList.add('active');
-        if(state.lvl >= 2) document.getElementById('badge-3').classList.add('active');
-
-        // Shopping List
         const list = document.getElementById('shoppingItems');
         if(state.shopping.length > 0) {
             list.innerHTML = state.shopping.map(i => `<li>${i}</li>`).join('');
         }
-
+        
         if(goalChart) {
-            goalChart.data.datasets[0].data = [state.cals, Math.max(0, state.goal - state.cals)];
+            goalChart.data.datasets[0].data = [state.cals, Math.max(0, 2000 - state.cals)];
             goalChart.update();
         }
     }
 
-    // --- CORE LOGIC ---
-    function addWater() {
-        if(state.water < 8) {
-            state.water++;
-            addXP(15);
-            save();
-        } else { showToast("Fully Hydrated! 💧"); }
-    }
+    function addWater() { if(state.water < 8) { state.water++; addXP(15); save(); } }
 
     function getMeal() {
         const type = document.getElementById('mType').value;
-        const meal = meals[type][Math.floor(Math.random() * meals[type].length)];
+        const pool = meals[type];
+        const meal = pool[Math.floor(Math.random() * pool.length)];
         
         document.getElementById('mName').innerText = meal.n;
-        const img = document.getElementById('mealImage');
-        img.src = meal.img; img.style.display = "block";
+        document.getElementById('mealImage').src = meal.img;
+        document.getElementById('imgCont').style.display = "block";
+        document.getElementById('stepBtn').style.display = "inline-block";
+        document.getElementById('stepsContainer').innerHTML = `<strong>Steps:</strong><ul>${meal.steps.map(s => `<li>${s}</li>`).join('')}</ul>`;
         
         state.cals += meal.c;
-        
-        // Add unique ingredients to shop list
-        meal.ing.forEach(item => {
-            if(!state.shopping.includes(item)) state.shopping.push(item);
-        });
+        meal.ing.forEach(i => { if(!state.shopping.includes(i)) state.shopping.push(i); });
+        addXP(40); save();
+    }
 
-        document.getElementById('stepBtn').style.display = "inline-block";
-        document.getElementById('stepsContainer').style.display = "none";
-        document.getElementById('stepsContainer').innerHTML = `<p><strong>Brief Steps:</strong></p><ul>${meal.steps.map(s => `<li>${s}</li>`).join('')}</ul>`;
-        
-        addXP(35);
-        save();
+    function addCustomMeal() {
+        const n = document.getElementById('customName').value;
+        const c = parseInt(document.getElementById('customCals').value);
+        if(n && c) {
+            state.cals += c;
+            addXP(20); save();
+            document.getElementById('customName').value = "";
+            document.getElementById('customCals').value = "";
+            showToast(`Logged: ${n} 🥗`);
+        }
     }
 
     function addXP(amt) {
         state.xp += amt;
-        if(state.xp >= 100) {
-            state.lvl++;
-            state.xp = 0;
-            showToast("LEVEL UP! 🚀");
-        }
+        if(state.xp >= 100) { state.lvl++; state.xp = 0; showToast("LEVEL UP! 🚀"); }
         save();
     }
 
     function toggleSteps() {
-        const c = document.getElementById('stepsContainer');
-        c.style.display = c.style.display === "none" ? "block" : "none";
+        const s = document.getElementById('stepsContainer');
+        s.style.display = s.style.display === "none" ? "block" : "none";
     }
 
-    function clearShopList() { state.shopping = []; save(); location.reload(); }
-    function clearData() { if(confirm("Clear all data and progress?")) { localStorage.clear(); location.reload(); } }
+    function clearShopList() { state.shopping = []; save(); }
+    function resetDay() { if(confirm("Reset today's calories and water?")) { state.cals = 0; state.water = 0; save(); } }
+    function clearAllData() { if(confirm("Wipe all progress?")) { localStorage.clear(); location.reload(); } }
+    
     function showToast(msg) {
         const t = document.getElementById('toast'); t.innerText = msg;
         t.classList.add('active'); setTimeout(() => t.classList.remove('active'), 3000);
     }
 
     function toggleTheme() { document.body.className = document.body.className === 'light-mode' ? 'dark-mode' : 'light-mode'; }
-    function toggleNeon() { document.body.className = 'neon-mode'; }
 
-    // Init App
-    window.onload = () => { initChart(); updateUI(); animate(); };
-
-    // --- BACKGROUND PARTICLES ---
+    // --- MULTI-COLOR PARTICLE SYSTEM ---
     const canvas = document.getElementById('particleCanvas');
     const ctx = canvas.getContext('2d');
+    let particles = [];
+    const colors = ['#3b82f6', '#22c55e', '#ef4444', '#eab308']; // Blue, Green, Red, Yellow
+
     function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
     window.onresize = resize; resize();
 
-    function animate() {
-        ctx.clearRect(0,0,canvas.width, canvas.height);
-        ctx.fillStyle = "rgba(99, 102, 241, 0.1)";
-        for(let i=0; i<40; i++) {
+    class Particle {
+        constructor() {
+            this.reset();
+        }
+        reset() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.size = Math.random() * 3 + 1;
+            this.color = colors[Math.floor(Math.random() * colors.length)];
+            this.speed = Math.random() * 0.5 + 0.2;
+        }
+        update() {
+            this.y -= this.speed;
+            if (this.y < 0) this.reset();
+        }
+        draw() {
+            ctx.fillStyle = this.color;
+            ctx.globalAlpha = 0.4;
             ctx.beginPath();
-            ctx.arc(Math.random()*canvas.width, Math.random()*canvas.height, 1.5, 0, Math.PI*2);
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
             ctx.fill();
         }
+    }
+
+    for (let i = 0; i < 70; i++) particles.push(new Particle());
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => { p.update(); p.draw(); });
         requestAnimationFrame(animate);
     }
+
+    window.onload = () => { initChart(); updateUI(); animate(); };
 </script>
 </body>
 </html>
