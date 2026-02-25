@@ -1,1 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VITALITY ULTRA | Total Wellness Ecosystem</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00f2fe;
+            --secondary: #4facfe;
+            --bg: #0b0f1a;
+            --card: rgba(23, 32, 51, 0.8);
+            --text: #f8fafc;
+            --accent: #7c4dff;
+            --glass: rgba(255, 255, 255, 0.03);
+        }
 
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(circle at 0% 0%, #16213e 0%, #0b0f1a 100%);
+            color: var(--text);
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        /* --- Advanced Grid System --- */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 260px 1fr 340px;
+            grid-template-rows: auto 1fr auto;
+            gap: 20px;
+            max-width: 1700px;
+            margin: 0 auto;
+            padding: 20px;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .glass-panel {
+            background: var(--card);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 28px;
+            padding: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .glass-panel:hover { transform: translateY(-5px); border-color: var(--primary); }
+
+        /* --- Component: Breathing Visualizer --- */
+        .breath-hub {
+            text-align: center;
+            padding: 40px;
+            background: linear-gradient(145deg, rgba(0, 242, 254, 0.05), rgba(124, 77, 255, 0.05));
+        }
+
+        .breath-circle {
+            width: 80px; height: 80px;
+            background: var(--primary);
+            border-radius: 50%;
+            margin: 30px auto;
+            box-shadow: 0 0 50px var(--primary);
+            animation: breathe 8s infinite ease-in-out;
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); filter: blur(2px); opacity: 0.3; }
+            50% { transform: scale(2.2); filter: blur(0px); opacity: 1; }
+        }
+
+        /* --- Component: Progress Gauges --- */
+        .gauge-container {
+            position: relative;
+            width: 120px; height: 120px;
+            margin: 0 auto;
+        }
+
+        .gauge-svg { transform: rotate(-90deg); }
+
+        .gauge-bg { fill: none; stroke: var(--glass); stroke-width: 8; }
+        .gauge-value {
+            fill: none; stroke: url(#grad1);
+            stroke-width: 8; stroke-linecap: round;
+            stroke-dasharray: 283; stroke-dashoffset: 70;
+            transition: stroke-dashoffset 1s ease;
+        }
+
+        /* --- Navigation --- */
+        .side-link {
+            display: flex; align-items: center; gap: 12px;
+            padding: 14px; color: #94a3b8; text-decoration: none;
+            border-radius: 12px; transition: 0.2s;
+        }
+        .side-link:hover { background: var(--glass); color: var(--primary); }
+        .side-link.active { background: rgba(0, 242, 254, 0.1); color: var(--primary); font-weight: 600; }
+
+        /* --- Buttons --- */
+        .btn-prime {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border: none; padding: 14px; border-radius: 14px;
+            color: #0b0f1a; font-weight: 800; cursor: pointer;
+            width: 100%; text-transform: uppercase; letter-spacing: 1px;
+            box-shadow: 0 10px 20px rgba(0, 242, 254, 0.2);
+        }
+
+        h1, h2, h3 { margin-top: 0; letter-spacing: -0.5px; }
+        .accent-text { color: var(--primary); }
+
+    </style>
+</head>
+<body>
+
+<div class="dashboard">
+    
+    <aside class="glass-panel" style="display:flex; flex-direction:column; gap:20px;">
+        <div class="brand">
+            <h2 style="margin:0;">VITALITY<span class="accent-text">.OS</span></h2>
+            <p style="font-size: 0.8rem; color: #64748b;">Premium Wellness Logic</p>
+        </div>
+
+        <nav style="flex-grow: 1;">
+            <a href="#" class="side-link active"><span>🏠</span> Dashboard</a>
+            <a href="#" class="side-link"><span>🥗</span> Nutrition Lab</a>
+            <a href="#" class="side-link"><span>⚡</span> Kinetic Plan</a>
+            <a href="#" class="side-link"><span>🧘</span> Zen Space</a>
+            <a href="#" class="side-link"><span>📊</span> Vital Analytics</a>
+        </nav>
+
+        <div style="background: var(--glass); padding: 15px; border-radius: 15px;">
+            <small style="color:#64748b;">Daily Streak</small>
+            <h3 style="margin:0;">🔥 118 Days</h3>
+        </div>
+    </aside>
+
+    <main style="display: flex; flex-direction: column; gap: 20px;">
+        
+        <div class="glass-panel" style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1 style="margin:0;">Welcome back, <span class="accent-text">Alex</span>.</h1>
+                <p style="color:#94a3b8; margin: 5px 0 0;">Your energy profile is optimized for a creative session today.</p>
+            </div>
+            <div style="text-align: right;">
+                <span style="font-size: 0.7rem; color: #64748b; display: block;">LEVEL 42</span>
+                <div style="width: 150px; height: 6px; background: var(--glass); border-radius: 3px; margin-top: 5px;">
+                    <div style="width: 75%; height: 100%; background: var(--primary); border-radius: 3px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="glass-panel breath-hub">
+                <h3>Resonance Breathing</h3>
+                <p style="font-size: 0.8rem; opacity: 0.7;">Sync your focus. Reduce cognitive load.</p>
+                <div class="breath-circle"></div>
+                <button class="btn-prime" style="width: auto; padding: 10px 30px;">Start Session</button>
+            </div>
+
+            <div class="glass-panel">
+                <h3>Smart Habits</h3>
+                <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 20px;">
+                    <label style="display:flex; gap:10px; align-items:center;">
+                        <input type="checkbox" checked> 15m Morning Sunlight
+                    </label>
+                    <label style="display:flex; gap:10px; align-items:center;">
+                        <input type="checkbox"> Morning Mobility Routine
+                    </label>
+                    <label style="display:flex; gap:10px; align-items:center;">
+                        <input type="checkbox"> 3L Hydration Protocol
+                    </label>
+                    <label style="display:flex; gap:10px; align-items:center;">
+                        <input type="checkbox"> Digital Sunset (8 PM)
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-panel" style="flex-grow: 1;">
+            <h3>Kinetic Schedule</h3>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px;">
+                <div style="background: var(--glass); padding: 15px; border-radius: 18px;">
+                    <small style="color:var(--primary)">08:00 AM</small>
+                    <p style="margin:5px 0; font-weight:600;">Yoga Flow</p>
+                </div>
+                <div style="background: var(--glass); padding: 15px; border-radius: 18px; border-left: 3px solid var(--accent);">
+                    <small style="color:var(--accent)">01:00 PM</small>
+                    <p style="margin:5px 0; font-weight:600;">Strength Block</p>
+                </div>
+                <div style="background: var(--glass); padding: 15px; border-radius: 18px;">
+                    <small style="color:var(--primary)">09:00 PM</small>
+                    <p style="margin:5px 0; font-weight:600;">Sleep Prep</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <aside style="display: flex; flex-direction: column; gap: 20px;">
+        <div class="glass-panel" style="text-align: center;">
+            <h3>Readiness Score</h3>
+            <div class="gauge-container">
+                <svg class="gauge-svg" viewBox="0 0 100 100" width="120" height="120">
+                    <defs>
+                        <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:var(--primary);stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:var(--secondary);stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <circle class="gauge-bg" cx="50" cy="50" r="45"/>
+                    <circle class="gauge-value" cx="50" cy="50" r="45"/>
+                </svg>
+                <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%);">
+                    <h2 style="margin:0;">88</h2>
+                </div>
+            </div>
+            <p style="font-size: 0.8rem; color:#94a3b8; margin-top: 15px;">Recovery is optimal. Push for a Personal Best today.</p>
+        </div>
+
+        <div class="glass-panel">
+            <h3>Bio-Clock Timers</h3>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <div style="display:flex; justify-content:space-between; padding: 8px; background:var(--glass); border-radius:8px;">
+                    <small>Caffeine Cutoff</small>
+                    <small class="accent-text">In 3h 12m</small>
+                </div>
+                <div style="display:flex; justify-content:space-between; padding: 8px; background:var(--glass); border-radius:8px;">
+                    <small>Blue Light Filter</small>
+                    <small style="color:var(--accent)">Auto-On @ 8PM</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-panel" style="background: linear-gradient(135deg, var(--accent), var(--secondary)); color: #fff;">
+            <h3>AI Coach Tip</h3>
+            <p style="font-size: 0.9rem; line-height: 1.4;">"Based on your sleep patterns, adding 5 minutes of stretching at 2 PM will prevent the afternoon energy slump."</p>
+        </div>
+    </aside>
+
+</div>
+
+<script>
+    // Logic for updating the readiness gauge (Demo value)
+    window.onload = () => {
+        const circle = document.querySelector('.gauge-value');
+        const percentage = 88;
+        const radius = 45;
+        const circumference = 2 * Math.PI * radius;
+        const offset = circumference - (percentage / 100) * circumference;
+        circle.style.strokeDasharray = circumference;
+        circle.style.strokeDashoffset = offset;
+    };
+</script>
+
+</body>
+</html>
