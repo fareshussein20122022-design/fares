@@ -3,257 +3,264 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meal Pro Infinity | Master Edition</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <title>TITAN OMNI | ULTIMA COHESION</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Syncopate:wght@700&family=Poppins:wght@300;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --primary: #6366f1; --secondary: #a855f7; --accent: #00d2ff;
-            --water: #3b82f6; --bg: #0f172a; --text: #f1f5f9;
-            --glass: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.1);
+            --primary: #6366f1; --secondary: #ff00ff; --accent: #00d2ff;
+            --water: #0080ff; --bg: #000; --text: #fff;
+            --glass: rgba(255, 255, 255, 0.03); --glass-border: rgba(255, 255, 255, 0.1);
+            --gold: #ffcc00; --hp: #ff0055; --shard: #00ffaa;
+            --hue: 280deg; /* Dynamic Hue Variable */
         }
 
-        /* PREMIUM GOLD THEME (LEVEL 10) */
-        .premium-mode { --bg: #0a0a05; --glass: rgba(212, 175, 55, 0.08); --glass-border: rgba(212, 175, 55, 0.3); }
-        .premium-text { background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; }
+        body { 
+            font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); 
+            margin: 0; padding: 15px; overflow-x: hidden;
+            background: radial-gradient(circle at center, hsl(var(--hue), 30%, 5%) 0%, #000 100%);
+            min-height: 100vh; cursor: crosshair; transition: background 1s ease;
+        }
 
-        body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 10px; transition: all 0.8s ease; min-height: 100vh; overflow-x: hidden; }
-        #particleCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
-        .container { max-width: 1200px; margin: auto; position: relative; z-index: 1; padding: 10px; }
+        /* 30+ DESIGN ENHANCEMENTS: SCANLINES, NOISE, & FILTERS */
+        body::before {
+            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%),
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
+            background-size: 100% 2px, 3px 100%; z-index: 1000; pointer-events: none;
+        }
 
+        .drippy-header { 
+            font-family: 'Syncopate', sans-serif; font-size: 3.5rem; text-align: center;
+            background: linear-gradient(to right, #fff, var(--accent), var(--secondary));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 20px var(--accent)); margin-bottom: 0;
+            animation: floating 3s ease-in-out infinite;
+        }
+
+        @keyframes floating { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+        .layout { display: grid; grid-template-columns: 360px 1fr 360px; gap: 20px; max-width: 1800px; margin: auto; }
+        @media (max-width: 1350px) { .layout { grid-template-columns: 1fr; } }
+
+        /* ADVANCED GLASSMORPHISM */
         .glass-card { 
-            background: var(--glass); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); 
-            border-radius: 30px; padding: 25px; margin-bottom: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-            transition: transform 0.3s ease;
+            background: var(--glass); backdrop-filter: blur(50px); 
+            border: 1px solid var(--glass-border); border-radius: 40px; 
+            padding: 30px; position: relative; overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transition: 0.5s cubic-bezier(0.2, 1, 0.3, 1);
         }
+        .glass-card:hover { border-color: var(--accent); transform: scale(1.01); box-shadow: 0 0 30px rgba(0, 210, 255, 0.15); }
 
-        /* ANIMATIONS */
-        .lvl5-pulse { animation: pulseGlow 2s infinite ease-in-out; }
-        @keyframes pulseGlow { 0%, 100% { box-shadow: 0 0 5px var(--primary); } 50% { box-shadow: 0 0 20px var(--primary); } }
-        .meal-slide-in { animation: slideIn 0.6s cubic-bezier(0.23, 1, 0.32, 1); }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        /* ARTIFACT SYSTEM */
+        .artifact-vortex { 
+            position: absolute; width: 50px; height: 50px; border: 2px solid var(--shard);
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            animation: morph 3s linear infinite; filter: drop-shadow(0 0 15px var(--shard));
+            display: none; pointer-events: none;
+        }
+        @keyframes morph { 0%, 100% { border-radius: 30% 70% 70% 30%; } 50% { border-radius: 70% 30% 30% 70%; transform: rotate(180deg); } }
 
-        /* UI ELEMENTS */
-        .meal-image-container { width: 100%; margin-top: 20px; border-radius: 20px; overflow: hidden; display: none; border: 2px solid var(--glass-border); aspect-ratio: 16 / 9; background: #000; }
-        #mealImage { width: 100%; height: 100%; object-fit: cover; filter: brightness(1.1); transition: 0.6s ease; }
-        .bottle { width: 65px; height: 105px; border: 3px solid rgba(255,255,255,0.2); margin: 15px auto; border-radius: 15px; overflow: hidden; position: relative; background: rgba(0,0,0,0.3); }
-        .wave-wrapper { position: absolute; bottom: 0; width: 100%; height: 0%; transition: height 1s ease; background: var(--water); box-shadow: 0 0 25px var(--water); }
-        
-        input, select, button { border-radius: 15px; padding: 12px; margin-bottom: 12px; width: 100%; border: none; font-family: inherit; }
-        select, input { background: var(--glass); color: var(--text); border: 1px solid var(--glass-border); }
-        button { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; font-weight: 700; cursor: pointer; transition: 0.3s; }
-        
-        #themeSection { display: none; align-items: center; gap: 8px; background: var(--glass); padding: 5px 15px; border-radius: 50px; border: 1px solid var(--glass-border); }
-        #colorPicker { width: 25px; height: 25px; padding: 0; border-radius: 50%; border: none; cursor: pointer; background: none; }
-        
-        .xp-bar { height: 14px; background: rgba(0,0,0,0.3); border-radius: 20px; overflow: hidden; margin-top: 10px; border: 1px solid var(--glass-border); }
-        .xp-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--primary)); transition: 1s ease; width: 0%; }
-        
-        /* HALL OF FAME LIST */
-        #historyList { list-style: none; padding: 0; max-height: 250px; overflow-y: auto; }
-        #historyList li { background: rgba(255,255,255,0.05); padding: 10px 15px; border-radius: 15px; margin-bottom: 8px; display: flex; justify-content: space-between; font-size: 0.9rem; border: 1px solid var(--glass-border); }
-        
-        #toast { position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%); background: var(--primary); padding: 15px 40px; border-radius: 50px; color: white; transition: 0.5s; z-index: 1000; font-weight: bold; }
-        #toast.active { bottom: 40px; }
-        .chart-container { width: 170px; height: 170px; margin: auto; }
+        /* BARS & METRICS */
+        .bar-wrap { height: 12px; background: rgba(0,0,0,0.5); border-radius: 20px; border: 1px solid #222; overflow: hidden; margin: 10px 0; }
+        .bar-fill { height: 100%; transition: 1s cubic-bezier(0.1, 1, 0.1, 1); width: 0%; }
+
+        /* UI BUTTONS */
+        button { 
+            background: rgba(255,255,255,0.05); color: #fff; border: 1px solid var(--glass-border);
+            padding: 15px; border-radius: 15px; font-family: 'Orbitron'; font-weight: 900;
+            cursor: pointer; transition: 0.3s; text-transform: uppercase; letter-spacing: 2px;
+        }
+        button:hover { background: var(--secondary); color: #000; box-shadow: 0 0 20px var(--secondary); }
+
+        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--accent); color: #000; padding: 20px 40px; border-radius: 50px; font-weight: 900; z-index: 2000; display: none; font-family: 'Orbitron'; }
     </style>
 </head>
-<body class="dark-mode">
+<body>
 
-<canvas id="particleCanvas"></canvas>
-<div id="toast">LEVEL UP! 🚀</div>
+<div id="toast">SYSTEM INITIALIZED</div>
 
 <div class="container">
-    <header style="display: flex; justify-content: space-between; align-items: center; padding: 25px 0; flex-wrap: wrap; gap: 15px;">
-        <h1 style="margin:0; font-weight: 800; letter-spacing: -3px; font-size: 2.8rem;">MEAL<span id="logoAccent" style="color: var(--primary)">PRO</span></h1>
-        
-        <div style="display: flex; gap: 10px; align-items: center;">
-            <div id="themeSection">
-                <input type="color" id="colorPicker" value="#6366f1" oninput="changeThemeColor(this.value)">
-            </div>
-            <button onclick="resetDay()" style="width: auto; padding: 10px 18px; background: #f59e0b;">☀️ New Day</button>
-            <button onclick="clearAllData()" style="width: auto; padding: 10px 15px; background: #ef4444;">🗑️</button>
+    <header style="padding: 40px 0;">
+        <h1 class="drippy-header">TITAN OMNI</h1>
+        <div style="text-align:center; font-family:'Orbitron'; font-size:0.8rem; letter-spacing:12px; opacity:0.6;">
+            [ PRESTIGE: <span id="preVal">0</span> // SHARDS: <span id="shaVal" style="color:var(--shard)">0</span> ]
         </div>
     </header>
 
-    <div class="dashboard-grid">
-        <div class="glass-card" style="text-align: center;">
-            <h3>Goal Progress</h3>
-            <div class="chart-container"><canvas id="goalChart"></canvas></div>
-            <p style="font-weight: 600; margin-top: 15px;"><span id="cals">0</span> / 2000 kcal</p>
-        </div>
-
-        <div class="glass-card" style="text-align: center;">
-            <h3>Hydration</h3>
-            <div class="bottle"><div id="waterWrapper" class="wave-wrapper"></div></div>
-            <p><span id="waterCount">0</span>/8 glasses</p>
-            <button onclick="addWater()">+ Drink Glass</button>
-        </div>
-
-        <div class="glass-card" id="rankCard">
-            <h3>Rank: <span id="rank">Rookie</span></h3>
-            <h2 id="lvlDisplay" style="margin: 5px 0; font-weight: 800; color: var(--accent); font-size: 2rem;">LVL <span id="lvl">1</span></h2>
-            <div class="xp-bar"><div id="xpFill" class="xp-fill"></div></div>
-            <p style="font-size: 0.85rem; margin-top: 10px; opacity: 0.8;">XP: <span id="xpText">0</span>/100</p>
-        </div>
-    </div>
-
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
-        <div class="glass-card">
-            <h3>🍳 Smart Generator</h3>
-            <select id="mType">
-                <option value="breakfast">Breakfast</option>
-                <option value="lunch">Lunch</option>
-                <option value="dinner">Dinner</option>
-                <option value="balanced">Balanced</option>
-            </select>
-            <button onclick="getMeal()" id="genBtn">Generate</button>
-            <div id="mDisplay" style="text-align: center;">
-                <h4 id="mName" style="margin: 15px 0;"></h4>
-                <div class="meal-image-container" id="imgCont"><img id="mealImage" src=""></div>
+    <div class="layout">
+        <aside>
+            <div class="glass-card">
+                <h3>🔱 SKILL TREE</h3>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;" id="skillGrid">
+                    <button onclick="buySkill('S1', 500)">DMG+</button>
+                    <button onclick="buySkill('S2', 500)">XP+</button>
+                </div>
             </div>
-        </div>
 
-        <div class="glass-card">
-            <h3>➕ Quick Log</h3>
-            <input type="text" id="customName" placeholder="Meal name">
-            <input type="number" id="customCals" placeholder="Calories">
-            <button onclick="addCustomMeal()" id="customBtn">Add to Total</button>
-        </div>
-    </div>
+            <div class="glass-card">
+                <h3>🎒 INVENTORY</h3>
+                <div id="invGrid" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:10px;">
+                    </div>
+            </div>
 
-    <div class="glass-card">
-        <h3>🏆 Hall of Fame (History)</h3>
-        <ul id="historyList">
-            <li style="opacity:0.5; justify-content:center;">No meals logged yet...</li>
-        </ul>
+            <div class="glass-card">
+                <h3>⚔️ WORLD EVENT</h3>
+                <div id="eventTimer" style="color:var(--hp); font-weight:900;">NEXT EVENT: 04:00:00</div>
+                <div class="bar-wrap"><div id="eventHp" class="bar-fill" style="background:var(--hp);"></div></div>
+            </div>
+        </aside>
+
+        <main>
+            <div class="glass-card" style="text-align:center;">
+                <div id="vortex" class="artifact-vortex"></div>
+                <h3>CORE SINGULARITY</h3>
+                <div style="height: 280px; position: relative;">
+                    <canvas id="coreChart"></canvas>
+                    <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);">
+                        <h1 id="cals" style="font-size: 3.5rem; margin:0;">0</h1>
+                        <small>KCAL</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card">
+                <h3>🧬 BIO-DECODER</h3>
+                <input type="text" id="aiInput" placeholder="Input Neural Stream..." style="background:#000; border:1px solid #333; color:white; padding:18px; width:calc(100% - 38px); border-radius:18px; margin-bottom:12px; font-family:'Orbitron';">
+                <button onclick="processData()" style="width:100%; background:var(--accent); color:#000;">DECODE</button>
+            </div>
+        </main>
+
+        <aside>
+            <div class="glass-card">
+                <h3>LVL <span id="lvl">1</span></h3>
+                <div class="bar-wrap"><div id="xpFill" class="bar-fill" style="background:var(--secondary);"></div></div>
+                <div style="display:flex; justify-content:space-between; font-size:0.7rem;">
+                    <span id="xpDisplay">0 XP</span>
+                    <span>NEXT: 2500</span>
+                </div>
+                <button id="presBtn" onclick="doPrestige()" style="margin-top:15px; border-color:var(--gold); color:var(--gold); display:none;">ASCEND TIMELINE</button>
+            </div>
+
+            <div class="glass-card" style="border-color:var(--hp);">
+                <h3>BOSS: <span id="bossName">ARCH-REAPER</span></h3>
+                <div id="bossSprite" style="font-size:4rem; text-align:center;">💀</div>
+                <div class="bar-wrap"><div id="bossHp" class="bar-fill" style="background:var(--hp); width:100%;"></div></div>
+            </div>
+
+            <div class="glass-card">
+                <button onclick="addH2O()" style="background:var(--water); width:100%;">INJECT H2O</button>
+                <div class="bar-wrap"><div id="hFill" class="bar-fill" style="background:var(--water);"></div></div>
+            </div>
+        </aside>
     </div>
 </div>
 
 <script>
-    const meals = {
-        breakfast: [{n:"Avocado Toast", c:320, img:"https://images.unsplash.com/photo-1525351484163-7529414344d8?w=1200"}],
-        lunch: [{n:"Chicken Wrap", c:550, img:"https://images.unsplash.com/photo-1626700051175-6818013e1d4f?w=1200"}],
-        dinner: [{n:"Salmon & Veg", c:500, img:"https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=1200"}],
-        balanced: [{n:"Steak Bowl", c:680, img:"https://images.unsplash.com/photo-1546964124-0cce460f38ef?w=1200"}]
+    // --- RESTORED GLOBAL STATE ---
+    let state = JSON.parse(localStorage.getItem('TitanUltima_v1')) || {
+        xp: 0, cals: 0, lvl: 1, prestige: 0, shards: 0, water: 0,
+        bossHp: 50000, items: [], skills: []
     };
 
-    let state = JSON.parse(localStorage.getItem('mealProTitanVFinal')) || {
-        cals: 0, water: 0, xp: 0, lvl: 1, customColor: '#6366f1', isPremium: false, history: []
-    };
+    let chart;
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-    let goalChart;
-
-    function save() { localStorage.setItem('mealProTitanVFinal', JSON.stringify(state)); updateUI(); }
-
-    function changeThemeColor(val) {
-        state.customColor = val;
-        document.documentElement.style.setProperty('--primary', val);
-        save();
+    function playSfx(f, t='sine') {
+        const o = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        o.type = t; o.frequency.value = f;
+        g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.8);
+        o.connect(g); g.connect(audioCtx.destination);
+        o.start(); o.stop(audioCtx.currentTime + 0.8);
     }
 
-    function initChart() {
-        const ctx = document.getElementById('goalChart').getContext('2d');
-        goalChart = new Chart(ctx, {
-            type: 'doughnut',
-            data: { datasets: [{ data: [state.cals, Math.max(0, 2000 - state.cals)], backgroundColor: [state.customColor, 'rgba(255,255,255,0.05)'], borderWidth: 0 }] },
-            options: { cutout: '85%', plugins: { tooltip: { enabled: false } } }
-        });
+    function save() {
+        localStorage.setItem('TitanUltima_v1', JSON.stringify(state));
+        updateUI();
     }
 
     function updateUI() {
-        document.getElementById('cals').innerText = state.cals;
-        document.getElementById('waterCount').innerText = state.water;
-        document.getElementById('waterWrapper').style.height = (state.water * 12.5) + '%';
         document.getElementById('lvl').innerText = state.lvl;
-        document.getElementById('xpText').innerText = state.xp;
-        document.getElementById('xpFill').style.width = state.xp + '%';
-        document.documentElement.style.setProperty('--primary', state.customColor);
-
-        if(state.lvl >= 2) document.getElementById('themeSection').style.display = "flex";
+        document.getElementById('cals').innerText = state.cals;
+        document.getElementById('xpDisplay').innerText = Math.floor(state.xp) + " XP";
+        document.getElementById('preVal').innerText = state.prestige;
+        document.getElementById('shaVal').innerText = state.shards;
+        document.getElementById('xpFill').style.width = (state.xp % 2500 / 25) + "%";
+        document.getElementById('bossHp').style.width = (state.bossHp / 500) + "%";
+        document.getElementById('hFill').style.width = state.water + "%";
         
-        if(state.lvl >= 5) {
-            document.getElementById('rankCard').classList.add('lvl5-pulse');
-            document.getElementById('genBtn').classList.add('lvl5-pulse');
-        }
+        // Prestige Logic
+        if(state.lvl >= 20) document.getElementById('presBtn').style.display = 'block';
+        if(state.prestige > 0) document.getElementById('vortex').style.display = 'block';
 
-        if(state.lvl >= 10) {
-            document.body.classList.add('premium-mode');
-            document.getElementById('logoAccent').classList.add('premium-text');
-            document.getElementById('lvlDisplay').classList.add('premium-text');
-            document.getElementById('rank').innerText = "TITAN PREMIUM 👑";
-            if(!state.isPremium) { state.customColor = "#D4AF37"; state.isPremium = true; }
-        } else {
-            document.getElementById('rank').innerText = state.lvl > 5 ? "Athlete" : "Rookie";
-        }
+        // Update Hue based on Boss HP
+        document.documentElement.style.setProperty('--hue', (state.bossHp / 500) + 'deg');
 
-        const hList = document.getElementById('historyList');
-        if(state.history.length > 0) {
-            hList.innerHTML = state.history.map(item => `<li><span>${item.n}</span> <strong>+${item.c} kcal</strong></li>`).reverse().join('');
-        }
-
-        if(goalChart) {
-            goalChart.data.datasets[0].backgroundColor[0] = state.customColor;
-            goalChart.data.datasets[0].data = [state.cals, Math.max(0, 2000 - state.cals)];
-            goalChart.update();
+        if(chart) {
+            chart.data.datasets[0].data = [state.cals, 3500];
+            chart.update();
         }
     }
 
-    function addWater() { if(state.water < 8) { state.water++; addXP(15); save(); } }
-
-    function getMeal() {
-        const type = document.getElementById('mType').value;
-        const meal = meals[type][0];
-        document.getElementById('mName').innerText = meal.n;
-        document.getElementById('mealImage').src = meal.img;
-        document.getElementById('imgCont').style.display = "block";
-        if(state.lvl >= 5) document.getElementById('imgCont').classList.add('meal-slide-in');
-        state.cals += meal.c;
-        state.history.push({n: meal.n, c: meal.c});
-        addXP(40); save();
-    }
-
-    function addCustomMeal() {
-        const n = document.getElementById('customName').value || "Quick Snack";
-        const c = parseInt(document.getElementById('customCals').value);
-        if(c) { 
-            state.cals += c; 
-            state.history.push({n: n, c: c});
-            addXP(20); save(); 
-            document.getElementById('customCals').value = ""; 
-            document.getElementById('customName').value = "";
-            showToast(`Logged!`); 
+    function processData() {
+        const val = document.getElementById('aiInput').value;
+        if(!val) return;
+        playSfx(440, 'square');
+        const r = Math.random();
+        let cals = Math.floor(Math.random()*800)+200;
+        
+        if(r > 0.95) { state.shards += 2; showToast("DIVINE DATA DETECTED"); }
+        
+        state.cals += cals;
+        state.xp += 200 * (1 + state.prestige);
+        state.bossHp = Math.max(0, state.bossHp - cals);
+        
+        if(state.xp >= state.lvl * 2500) {
+            state.lvl++;
+            playSfx(880, 'sawtooth');
+            showToast("ASCENSION REACHED");
         }
-    }
-
-    function addXP(amt) {
-        state.xp += amt;
-        if(state.xp >= 100) { state.lvl++; state.xp = 0; showToast(`LVL ${state.lvl} REACHED!`); }
+        document.getElementById('aiInput').value = '';
         save();
     }
 
-    function resetDay() { if(confirm("New day? History will be kept!")) { state.cals = 0; state.water = 0; save(); } }
-    function clearAllData() { localStorage.clear(); location.reload(); }
-    function showToast(msg) { const t = document.getElementById('toast'); t.innerText = msg; t.classList.add('active'); setTimeout(() => t.classList.remove('active'), 3000); }
-
-    const canvas = document.getElementById('particleCanvas');
-    const ctx = canvas.getContext('2d');
-    let pts = [];
-    function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-    window.onresize = resize; resize();
-    class Particle {
-        constructor() { this.reset(); }
-        reset() { 
-            this.x = Math.random()*canvas.width; this.y = Math.random()*canvas.height; 
-            this.s = Math.random()*2+1; this.v = Math.random()*0.4+0.1; 
-            this.c = state.lvl >= 10 ? '#D4AF37' : ['#3b82f6', '#22c55e', '#ef4444', '#eab308'][Math.floor(Math.random()*4)];
-        }
-        update() { this.y -= this.v; if(this.y < 0) this.reset(); }
-        draw() { ctx.fillStyle = this.c; ctx.globalAlpha = 0.3; ctx.beginPath(); ctx.arc(this.x, this.y, this.s, 0, Math.PI*2); ctx.fill(); }
+    function addH2O() {
+        playSfx(600);
+        state.water = Math.min(100, state.water + 10);
+        state.bossHp -= 1000;
+        save();
     }
-    for(let i=0; i<80; i++) pts.push(new Particle());
-    function anim() { ctx.clearRect(0,0,canvas.width,canvas.height); pts.forEach(p=>{p.update();p.draw();}); requestAnimationFrame(anim); }
-    window.onload = () => { initChart(); updateUI(); anim(); };
+
+    function doPrestige() {
+        state.prestige++;
+        state.lvl = 1; state.xp = 0; state.cals = 0;
+        state.bossHp = 100000 * (state.prestige + 1);
+        playSfx(200, 'square');
+        save();
+        location.reload();
+    }
+
+    function showToast(m) {
+        const t = document.getElementById('toast');
+        t.innerText = m; t.style.display = 'block';
+        setTimeout(() => t.style.display = 'none', 3000);
+    }
+
+    window.onload = () => {
+        const c = document.getElementById('coreChart').getContext('2d');
+        chart = new Chart(c, {
+            type: 'doughnut',
+            data: { datasets: [{ data: [0, 3500], backgroundColor: ['#00d2ff', '#111'], borderWidth: 0 }] },
+            options: { cutout: '85%', plugins: { tooltip: { enabled: false } } }
+        });
+        updateUI();
+        
+        // Render Inv Slots
+        const inv = document.getElementById('invGrid');
+        for(let i=0; i<8; i++) inv.innerHTML += `<div style="aspect-ratio:1; background:rgba(0,0,0,0.5); border:1px solid #333; border-radius:10px;"></div>`;
+    };
 </script>
 </body>
 </html>
