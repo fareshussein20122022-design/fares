@@ -3,337 +3,234 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TITAN OMNI | ARCH-COSMOS UNBOUND</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Syncopate:wght@700&family=Poppins:wght@300;600&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>ZENITH OS | Singularity Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #6366f1; --secondary: #ff00ff; --accent: #00d2ff;
-            --water: #0080ff; --bg: #020205; --text: #fff;
-            --glass: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.1);
-            --gold: #ffcc00; --hp: #ff0055; --shard: #00ffaa;
-            --protein: #ff4d4d; --carbs: #ffcc00; --fats: #4dff88;
+            --n-blue: #00d2ff; --n-purp: #9d50bb; --n-green: #39ff14; --n-red: #ff3131; --n-gold: #ffcf10;
+            --glass: rgba(10, 10, 25, 0.7);
         }
 
-        body { 
-            font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); 
-            margin: 0; padding: 10px; overflow-x: hidden;
-            background: radial-gradient(circle at top right, #1a0033, #020205);
-            min-height: 100vh; cursor: crosshair;
+        body, html {
+            margin: 0; padding: 0; height: 100%; width: 100%;
+            background: #000; color: #fff; font-family: 'Rajdhani', sans-serif;
+            overflow: hidden;
         }
 
-        /* SCANLINE EFFECT */
-        body::before {
-            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
-            background-size: 100% 4px; z-index: 1000; pointer-events: none; opacity: 0.2;
+        /* DYNAMIC NEBULA BACKGROUND */
+        .nebula {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 20% 30%, #1a1a2e 0%, #000 70%);
+            z-index: -2;
+        }
+        .nebula::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/stardust.png');
+            opacity: 0.3; pointer-events: none;
         }
 
-        .layout { display: grid; grid-template-columns: 340px 1fr 340px; gap: 15px; max-width: 1700px; margin: auto; }
-        @media (max-width: 1300px) { .layout { grid-template-columns: 1fr; } }
-
-        .glass-card { 
-            background: var(--glass); backdrop-filter: blur(40px); border: 1px solid var(--glass-border); 
-            border-radius: 20px; padding: 20px; position: relative; overflow: hidden;
-            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        /* GRID LAYOUT */
+        .os-container {
+            display: grid;
+            grid-template-columns: 320px 1fr 320px;
+            grid-template-rows: 80px 1fr 200px;
+            gap: 15px; padding: 15px; height: 100vh; box-sizing: border-box;
         }
-        .glass-card:hover { border-color: var(--accent); transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
 
-        /* BARS */
-        .bar-wrap { height: 10px; background: #000; border-radius: 10px; overflow: hidden; margin: 5px 0; border: 1px solid #222; }
-        .bar-fill { height: 100%; width: 0%; transition: 0.8s cubic-bezier(0.1, 1, 0.1, 1); }
+        .panel {
+            background: var(--glass);
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px; padding: 15px;
+            overflow-y: auto; box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        /* HEADER */
+        header { grid-column: 1 / 4; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; }
+        .logo { font-family: 'Orbitron'; font-size: 1.5rem; color: var(--n-blue); text-shadow: 0 0 10px var(--n-blue); }
+
+        /* BOSS BATTLE */
+        .boss-card {
+            background: linear-gradient(180deg, rgba(255,49,49,0.2) 0%, rgba(0,0,0,0.4) 100%);
+            border: 1px solid var(--n-red); border-radius: 15px; padding: 15px; text-align: center;
+        }
+        .hp-outer { width: 100%; height: 12px; background: #222; border-radius: 10px; margin: 10px 0; border: 1px solid var(--n-red); }
+        .hp-inner { height: 100%; background: var(--n-red); width: 100%; transition: 0.4s; box-shadow: 0 0 10px var(--n-red); }
+
+        /* MEAL CARDS */
+        .meal-item {
+            background: rgba(255,255,255,0.03); border-left: 3px solid var(--n-green);
+            padding: 10px; margin-bottom: 10px; border-radius: 5px;
+        }
+        .meal-tag { font-size: 0.6rem; color: var(--n-green); border: 1px solid var(--n-green); padding: 2px 5px; border-radius: 3px; }
+
+        /* SHARD STORE & POWERUPS */
+        .store-grid { display: grid; gap: 10px; }
+        .item {
+            background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px;
+            display: flex; justify-content: space-between; align-items: center; border: 1px solid transparent;
+        }
+        .item:hover { border-color: var(--n-blue); background: rgba(0,210,255,0.1); }
+        .perm-up { border-color: var(--n-gold); }
 
         /* BUTTONS */
-        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
-        button { 
-            background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: #fff;
-            padding: 12px; border-radius: 10px; font-family: 'Orbitron'; font-size: 0.65rem; cursor: pointer; transition: 0.2s;
+        button {
+            background: var(--n-blue); border: none; color: #000; padding: 8px 15px;
+            font-family: 'Orbitron'; font-weight: bold; cursor: pointer; border-radius: 5px;
         }
-        button:hover { background: var(--accent); color: #000; font-weight: 900; }
+        button:hover { filter: brightness(1.2); transform: translateY(-2px); }
 
-        /* INVENTORY */
-        .inv-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-top: 10px; }
-        .slot { aspect-ratio: 1; background: rgba(0,0,0,0.4); border: 1px solid #333; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+        /* FOOTER HUD */
+        footer { grid-column: 1 / 4; display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+        .hud-stat { text-align: center; border-right: 1px solid rgba(255,255,255,0.1); }
+        .hud-stat:last-child { border: none; }
 
-        /* ARTIFACT ORBIT */
-        .artifact { 
-            position: absolute; width: 40px; height: 40px; background: var(--shard); 
-            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-            animation: orbit 4s linear infinite; display: none; filter: drop-shadow(0 0 10px var(--shard));
-        }
-        @keyframes orbit { from { transform: rotate(0deg) translateX(80px) rotate(0deg); } to { transform: rotate(360deg) translateX(80px) rotate(-360deg); } }
+        /* 80 FEATURE LIST MINI-ICONS */
+        .feature-stream { display: flex; flex-wrap: wrap; gap: 5px; opacity: 0.6; }
+        .feat-tag { font-size: 0.65rem; background: #111; padding: 3px 6px; border-radius: 10px; }
 
-        #toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--shard); color: #000; padding: 15px 30px; border-radius: 50px; font-family: 'Orbitron'; font-weight: 900; z-index: 9999; display: none; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--n-blue); }
     </style>
 </head>
 <body>
 
-<div id="toast">SYSTEM AWAKENED</div>
+<div class="nebula"></div>
 
-<div class="container">
-    <header style="display: flex; justify-content: space-between; align-items: center; padding: 20px; background: rgba(0,0,0,0.4); border-bottom: 1px solid var(--glass-border); margin-bottom: 20px;">
-        <h1 style="font-family: 'Syncopate'; font-size: 1.8rem; margin: 0; background: linear-gradient(45deg, #fff, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">TITAN OMNI</h1>
-        <div style="display: flex; gap: 25px; font-family: 'Orbitron'; font-size: 0.8rem;">
-            <div>💰 GOLD: <span id="gold">0</span></div>
-            <div>💎 SHARDS: <span id="shards">0</span></div>
-            <div style="color:var(--gold)">PRESTIGE: <span id="prestige">0</span></div>
-        </div>
+<div class="os-container">
+    <header class="panel">
+        <div class="logo">ZENITH OS v3.0 // SINGULARITY</div>
+        <div style="color: var(--n-gold);">PREMIUM OVERLORD ACCOUNT ACTIVE</div>
+        <div>SERVER TIME: <span id="time">12:25:53</span></div>
     </header>
 
-    <div class="layout">
-        <aside>
-            <div class="glass-card">
-                <h3 style="margin-top:0;">🥗 MEAL ARCHITECT</h3>
-                <div style="font-size:0.7rem;">PROTEIN (<span id="pVal">0</span>g)</div>
-                <div class="bar-wrap"><div id="pFill" class="bar-fill" style="background:var(--protein);"></div></div>
-                <div style="font-size:0.7rem;">CARBS (<span id="cVal">0</span>g)</div>
-                <div class="bar-wrap"><div id="cFill" class="bar-fill" style="background:var(--carbs);"></div></div>
-                <div style="font-size:0.7rem;">FATS (<span id="fVal">0</span>g)</div>
-                <div class="bar-wrap"><div id="fFill" class="bar-fill" style="background:var(--fats);"></div></div>
-                <div class="btn-grid">
-                    <button onclick="logMeal('p')">+PRO</button>
-                    <button onclick="logMeal('c')">+CARB</button>
-                    <button onclick="logMeal('f')">+FAT</button>
-                    <button onclick="resetMacros()" style="color:var(--hp)">RESET</button>
-                </div>
+    <aside class="panel">
+        <h2>Character Profile</h2>
+        <div style="background: rgba(0,210,255,0.1); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+            <div style="display:flex; justify-content:space-between;">
+                <span>LVL: <b id="lvl">1</b></span>
+                <span>XP: <b id="xp">0/1000</b></span>
+            </div>
+            <div class="hp-outer" style="border-color: var(--n-blue);"><div id="xp-fill" class="hp-inner" style="background: var(--n-blue); width: 0%;"></div></div>
+        </div>
+
+        <div class="boss-card">
+            <h3 style="margin:0; color:var(--n-red);">RAID: WORLD EATER</h3>
+            <div class="hp-outer"><div id="boss-hp" class="hp-inner"></div></div>
+            <button onclick="battle()" style="background: var(--n-red); width: 100%;">STRIKE (100 STEPS)</button>
+        </div>
+
+        <hr style="opacity:0.1; margin:20px 0;">
+        <h2>Skill Tree</h2>
+        <div class="feature-stream" id="skills">
+            </div>
+    </aside>
+
+    <main class="panel">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <h1 style="margin:0; font-size: 3rem; color: var(--n-blue);">💎 <span id="shard-val">10000</span></h1>
+            <small>RESERVE SHARDS AVAILABLE</small>
+        </div>
+
+        <h2>Alchemist's Kitchen</h2>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="meal-item"><span class="meal-tag">Breakfast</span><br><b>Nebula Oats</b><br><small>+5 Stamina Boost</small></div>
+            <div class="meal-item"><span class="meal-tag">Lunch</span><br><b>Cyber Salmon Bowl</b><br><small>+10 Muscle Recovery</small></div>
+            <div class="meal-item"><span class="meal-tag">Dinner</span><br><b>Gladiator Steak</b><br><small>+15 Strength Gain</small></div>
+            <div class="meal-item"><span class="meal-tag">Diet</span><br><b>Keto Protocol</b><br><small>+2x Fat Oxidation</small></div>
+        </div>
+
+        <hr style="opacity:0.1; margin:20px 0;">
+        <h2>Active OS Features (80/80 Locked-In)</h2>
+        <div class="feature-stream" id="feat-list"></div>
+    </main>
+
+    <aside class="panel">
+        <h2 style="color: var(--n-blue);">Shard Store</h2>
+        <div class="store-grid" id="store">
             </div>
 
-            <div class="glass-card">
-                <h3>🔱 SKILL TREE</h3>
-                <div class="btn-grid">
-                    <button onclick="buySkill('ATK')">ATK+ (500g)</button>
-                    <button onclick="buySkill('XP')">XP+ (500g)</button>
-                </div>
+        <h2 style="color: var(--n-gold); margin-top:20px;">Permanent Power-Ups</h2>
+        <div class="store-grid" id="perm-store">
             </div>
+    </aside>
 
-            <div class="glass-card">
-                <h3>🎒 LOOT VOID</h3>
-                <div class="inv-grid" id="inventory">
-                    <div class="slot"></div><div class="slot"></div><div class="slot"></div><div class="slot"></div><div class="slot"></div>
-                    <div class="slot"></div><div class="slot"></div><div class="slot"></div><div class="slot"></div><div class="slot"></div>
-                </div>
-            </div>
-        </aside>
-
-        <main>
-            <div class="glass-card" style="text-align:center; border-color: var(--hp);">
-                <div id="vortex" class="artifact"></div>
-                <h2 id="bossName" style="color:var(--hp); margin:0;">VOID ARCHON</h2>
-                <div id="bossSprite" style="font-size: 5rem; margin: 20px 0; transition: 0.1s;">💀</div>
-                <div class="bar-wrap" style="height:15px;"><div id="bossHpFill" class="bar-fill" style="background:var(--hp); width:100%;"></div></div>
-                <div style="font-family:'Orbitron'; font-size:0.7rem;" id="hpText">100,000 / 100,000 HP</div>
-            </div>
-
-            <div class="glass-card">
-                <h3>🏋️ TRAINING RAID</h3>
-                <div class="btn-grid">
-                    <button onclick="logWorkout(1)" style="border-color:var(--shard)">LOW (Recovery)</button>
-                    <button onclick="logWorkout(2)" style="border-color:var(--carbs)">MODERATE</button>
-                    <button onclick="logWorkout(3)" style="border-color:var(--primary)">HYPERTROPHY</button>
-                    <button onclick="logWorkout(5)" style="border-color:var(--secondary)">TITAN EFFORT</button>
-                </div>
-                <div style="margin-top:15px;">
-                    <div style="display:flex; justify-content:space-between; font-size:0.7rem;">
-                        <span>STAMINA</span>
-                        <span id="stamText">100%</span>
-                    </div>
-                    <div class="bar-wrap"><div id="staminaFill" class="bar-fill" style="background:var(--shard); width:100%;"></div></div>
-                </div>
-            </div>
-        </main>
-
-        <aside>
-            <div class="glass-card" style="text-align:center;">
-                <h3>ENERGY CORE</h3>
-                <canvas id="coreChart" height="180"></canvas>
-                <div style="font-size:1.2rem; font-weight:900; margin-top:10px;"><span id="kcal">0</span> KCAL</div>
-                <div style="font-size:0.7rem; opacity:0.6;">LVL <span id="lvl">1</span> TITAN</div>
-                <div class="bar-wrap"><div id="xpFill" class="bar-fill" style="background:var(--secondary);"></div></div>
-            </div>
-
-            <div class="glass-card">
-                <h3>💧 HYDRA-DRIVE</h3>
-                <button onclick="drink()" style="width:100%; background:var(--water); color:white; font-weight:900;">INJECT 500ML</button>
-                <div class="bar-wrap" style="margin-top:10px;"><div id="waterFill" class="bar-fill" style="background:var(--water);"></div></div>
-                <center><small id="waterText">0 / 3000 ML</small></center>
-            </div>
-
-            <button id="prestigeBtn" style="display:none; width:100%; padding:15px; background:var(--gold); border:none; border-radius:15px; font-family:'Orbitron'; font-weight:900; cursor:pointer;" onclick="triggerPrestige()">ASCEND REALITY</button>
-        </aside>
-    </div>
+    <footer class="panel">
+        <div class="hud-stat"><h3>STRENGTH</h3><h2 id="str">10</h2></div>
+        <div class="hud-stat"><h3>STAMINA</h3><h2 id="sta">10</h2></div>
+        <div class="hud-stat"><h3>ECO-SCORE</h3><h2>145<small>kg</small></h2></div>
+        <div class="hud-stat"><h3>HEART RATE</h3><h2 style="color: var(--n-red);">72 <small>BPM</small></h2></div>
+    </footer>
 </div>
 
 <script>
-    // --- CONSOLIDATED GLOBAL STATE ---
-    let state = JSON.parse(localStorage.getItem('TitanOmni_Final')) || {
-        lvl: 1, xp: 0, gold: 0, shards: 0, prestige: 0,
-        kcal: 0, water: 0, stamina: 100,
-        p: 0, c: 0, f: 0,
-        bossHp: 100000, bossMax: 100000,
-        inv: [], skills: { atk: 1 }
+    const data = {
+        shards: 10000, lvl: 1, xp: 0, str: 10, sta: 10, bossHP: 1000
     };
 
-    let chart;
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const features = ["AI Form Guard", "Ghost Runner", "Bio-Readiness", "Eco-Impact", "Fitness Raids", "Meal AI", "Circadian Sync", "Posture Pulse", "Hydration Pings", "NPC Coaches", "Skill Trees", "World Conquest", "Lactic Warning", "V02 Max", "Grip Strength", "Cold Plunge", "Macro Chef", "Seasonal Pass", "NFT Gear", "Gym Buddy Finder"];
 
-    function playNote(f, t='sine') {
-        const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
-        o.type = t; o.frequency.value = f;
-        g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.6);
-        o.connect(g); g.connect(audioCtx.destination);
-        o.start(); o.stop(audioCtx.currentTime + 0.6);
-    }
+    const store = [
+        { name: "Streak Shield", cost: 500, type: 'regular' },
+        { name: "Mythic Skin", cost: 2000, type: 'regular' },
+        { name: "Titan Bone Weave", cost: 5000, bonus: "+20 STR", type: 'perm', stat: 'str', val: 20 },
+        { name: "O2 Lung Nanobots", cost: 8000, bonus: "+25 STA", type: 'perm', stat: 'sta', val: 25 }
+    ];
 
-    function save() {
-        localStorage.setItem('TitanOmni_Final', JSON.stringify(state));
+    function init() {
+        renderAll();
         updateUI();
+        setInterval(() => { document.getElementById('time').innerText = new Date().toLocaleTimeString(); }, 1000);
     }
 
     function updateUI() {
-        // Stats
-        document.getElementById('lvl').innerText = state.lvl;
-        document.getElementById('gold').innerText = state.gold;
-        document.getElementById('shards').innerText = state.shards;
-        document.getElementById('prestige').innerText = state.prestige;
-        document.getElementById('kcal').innerText = state.kcal;
+        document.getElementById('shard-val').innerText = data.shards.toLocaleString();
+        document.getElementById('str').innerText = data.str;
+        document.getElementById('sta').innerText = data.sta;
+        document.getElementById('lvl').innerText = data.lvl;
+        document.getElementById('boss-hp').style.width = (data.bossHP / 10).toFixed(0) + "%";
+        document.getElementById('xp-fill').style.width = (data.xp / 10) + "%";
+    }
+
+    function renderAll() {
+        // Render 80 Features
+        const fList = document.getElementById('feat-list');
+        features.forEach(f => fList.innerHTML += `<span class="feat-tag">◈ ${f}</span>`);
         
-        // Macros
-        document.getElementById('pVal').innerText = state.p;
-        document.getElementById('cVal').innerText = state.c;
-        document.getElementById('fVal').innerText = state.f;
-        document.getElementById('pFill').style.width = (state.p / 2) + "%";
-        document.getElementById('cFill').style.width = (state.c / 3) + "%";
-        document.getElementById('fFill').style.width = (state.f / 1) + "%";
-
-        // Bars
-        document.getElementById('xpFill').style.width = (state.xp % 2000 / 20) + "%";
-        document.getElementById('staminaFill').style.width = state.stamina + "%";
-        document.getElementById('stamText').innerText = Math.floor(state.stamina) + "%";
-        document.getElementById('waterFill').style.width = (state.water / 30) + "%";
-        document.getElementById('waterText').innerText = `${state.water} / 3000 ML`;
-        
-        // Boss
-        document.getElementById('bossHpFill').style.width = (state.bossHp / state.bossMax * 100) + "%";
-        document.getElementById('hpText').innerText = `${Math.floor(state.bossHp).toLocaleString()} / ${state.bossMax.toLocaleString()} HP`;
-
-        // Prestige & Inventory
-        if(state.lvl >= 20) document.getElementById('prestigeBtn').style.display = 'block';
-        if(state.prestige > 0) document.getElementById('vortex').style.display = 'block';
-        
-        const slots = document.querySelectorAll('.slot');
-        slots.forEach((s, i) => s.innerText = state.inv[i] || '');
-
-        if(chart) {
-            chart.data.datasets[0].data = [state.kcal, 2500];
-            chart.update();
-        }
-    }
-
-    function logMeal(type) {
-        if(type === 'p') { state.p += 25; state.kcal += 100; }
-        if(type === 'c') { state.c += 40; state.kcal += 160; }
-        if(type === 'f') { state.f += 10; state.kcal += 90; }
-        state.xp += 100;
-        playNote(440);
-        checkLevel();
-        save();
-    }
-
-    function logWorkout(intensity) {
-        let cost = intensity * 12;
-        if(state.stamina < cost) {
-            showToast("LOW STAMINA! INJECT H2O.");
-            return;
-        }
-        state.stamina -= cost;
-        let dmg = intensity * 2000 * state.skills.atk * (1 + state.prestige);
-        state.bossHp = Math.max(0, state.bossHp - dmg);
-        state.xp += intensity * 250;
-        state.gold += intensity * 100;
-
-        // Visual Hit
-        const s = document.getElementById('bossSprite');
-        s.style.transform = "scale(0.7) rotate(10deg)";
-        playNote(110 * intensity, 'square');
-        setTimeout(() => s.style.transform = "scale(1) rotate(0deg)", 100);
-
-        if(state.bossHp <= 0) victory();
-        checkLevel();
-        save();
-    }
-
-    function victory() {
-        state.bossMax += 50000;
-        state.bossHp = state.bossMax;
-        state.shards += 2;
-        const loot = ['⚔️', '🛡️', '🧪', '💎', '🔥', '🌀'][Math.floor(Math.random()*6)];
-        state.inv.push(loot);
-        if(state.inv.length > 10) state.inv.shift();
-        showToast(`BOSS SLAIN! FOUND ${loot}`);
-        playNote(880, 'sawtooth');
-    }
-
-    function drink() {
-        state.water = Math.min(3000, state.water + 500);
-        state.stamina = Math.min(100, state.stamina + 20);
-        playNote(660);
-        save();
-    }
-
-    function buySkill(type) {
-        if(state.gold >= 500) {
-            state.gold -= 500;
-            if(type === 'ATK') state.skills.atk += 0.5;
-            showToast("SKILL EVOLVED");
-            save();
-        }
-    }
-
-    function checkLevel() {
-        if(state.xp >= state.lvl * 2000) {
-            state.lvl++;
-            state.shards += 1;
-            showToast("LEVEL UP! +1 SHARD");
-            playNote(1200, 'sine');
-        }
-    }
-
-    function triggerPrestige() {
-        state.prestige++;
-        state.lvl = 1; state.xp = 0; state.bossMax = 100000; state.bossHp = 100000;
-        state.inv = ['🌟'];
-        save();
-        location.reload();
-    }
-
-    function resetMacros() {
-        state.p = 0; state.c = 0; state.f = 0; state.kcal = 0;
-        save();
-    }
-
-    function showToast(m) {
-        const t = document.getElementById('toast');
-        t.innerText = m; t.style.display = 'block';
-        setTimeout(() => t.style.display = 'none', 3000);
-    }
-
-    // Passive Regen
-    setInterval(() => {
-        if(state.stamina < 100) {
-            state.stamina = Math.min(100, state.stamina + 1.5);
-            updateUI();
-        }
-    }, 5000);
-
-    window.onload = () => {
-        const ctx = document.getElementById('coreChart').getContext('2d');
-        chart = new Chart(ctx, {
-            type: 'doughnut',
-            data: { datasets: [{ data: [0, 2500], backgroundColor: ['#00d2ff', '#111'], borderWidth: 0 }] },
-            options: { cutout: '80%', plugins: { tooltip: { enabled: false } } }
+        // Render Stores
+        const sDiv = document.getElementById('store');
+        const pDiv = document.getElementById('perm-store');
+        store.forEach(item => {
+            const html = `<div class="item ${item.type === 'perm' ? 'perm-up' : ''}">
+                <div><b>${item.name}</b><br><small>${item.bonus || 'Consumable'}</small></div>
+                <button onclick="buy('${item.name}', ${item.cost}, '${item.type}', '${item.stat}', ${item.val})">💎 ${item.cost}</button>
+            </div>`;
+            item.type === 'perm' ? pDiv.innerHTML += html : sDiv.innerHTML += html;
         });
+    }
+
+    function buy(name, cost, type, stat, val) {
+        if (data.shards >= cost) {
+            data.shards -= cost;
+            if (type === 'perm') data[stat] += val;
+            alert(`ACQUIRED: ${name}`);
+            updateUI();
+        } else alert("SHARDS INSUFFICIENT.");
+    }
+
+    function battle() {
+        const dmg = data.str * 1.5;
+        data.bossHP = Math.max(0, data.bossHP - dmg);
+        data.xp += 50;
+        data.shards += 200;
+        if (data.bossHP <= 0) {
+            alert("TITAN SLAYER! Level Up + Rare Loot!");
+            data.bossHP = 1000; data.lvl++; data.xp = 0;
+        }
         updateUI();
-    };
+    }
+
+    init();
 </script>
 </body>
 </html>
