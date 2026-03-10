@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZENITH OS | Singularity Edition</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <title>ZENITH OS | ETERNAL SINGULARITY</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&family=Rajdhani:wght@700&display=swap" rel="stylesheet">
     <style>
         :root {
             --n-blue: #00d2ff; --n-purp: #9d50bb; --n-green: #39ff14; --n-red: #ff3131; --n-gold: #ffcf10;
-            --glass: rgba(10, 10, 25, 0.7);
+            --main-theme: var(--n-blue);
+            --drip-blur: 8px;
         }
 
         body, html {
@@ -17,217 +18,225 @@
             overflow: hidden;
         }
 
-        /* DYNAMIC NEBULA BACKGROUND */
-        .nebula {
+        /* DYNAMIC COSMOS BACKGROUND */
+        .dots {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 20% 30%, #1a1a2e 0%, #000 70%);
-            z-index: -2;
+            background-image: radial-gradient(var(--main-theme) 1.5px, transparent 1.5px), 
+                              radial-gradient(var(--n-red) 1px, transparent 1px),
+                              radial-gradient(var(--n-green) 1px, transparent 1px);
+            background-size: 50px 50px, 80px 80px, 110px 110px;
+            z-index: -2; opacity: 0.6; animation: drift 40s linear infinite;
         }
-        .nebula::after {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: url('https://www.transparenttextures.com/patterns/stardust.png');
-            opacity: 0.3; pointer-events: none;
+        @keyframes drift { from { background-position: 0 0; } to { background-position: 1000px 1000px; } }
+
+        .drippy-glow {
+            position: absolute; top: 0; width: 100%; height: 15px;
+            background: linear-gradient(to bottom, var(--main-theme), transparent);
+            filter: blur(var(--drip-blur)); z-index: 10;
         }
 
-        /* GRID LAYOUT */
-        .os-container {
-            display: grid;
-            grid-template-columns: 320px 1fr 320px;
-            grid-template-rows: 80px 1fr 200px;
-            gap: 15px; padding: 15px; height: 100vh; box-sizing: border-box;
+        /* GRID ARCHITECTURE */
+        .os-grid {
+            display: grid; grid-template-columns: 360px 1fr 360px;
+            grid-template-rows: 90px 1fr 140px;
+            gap: 20px; padding: 20px; height: 100vh; box-sizing: border-box;
         }
 
         .panel {
-            background: var(--glass);
-            backdrop-filter: blur(30px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px; padding: 15px;
-            overflow-y: auto; box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.88); backdrop-filter: blur(30px);
+            border: 2px solid rgba(255, 255, 255, 0.12); border-radius: 25px; 
+            padding: 20px; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.8);
         }
 
-        /* HEADER */
-        header { grid-column: 1 / 4; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; }
-        .logo { font-family: 'Orbitron'; font-size: 1.5rem; color: var(--n-blue); text-shadow: 0 0 10px var(--n-blue); }
-
-        /* BOSS BATTLE */
-        .boss-card {
-            background: linear-gradient(180deg, rgba(255,49,49,0.2) 0%, rgba(0,0,0,0.4) 100%);
-            border: 1px solid var(--n-red); border-radius: 15px; padding: 15px; text-align: center;
+        /* LEVEL UP OVERLAY */
+        #ascension-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.98); z-index: 2000; display: none;
+            flex-direction: column; justify-content: center; align-items: center; text-align: center;
         }
-        .hp-outer { width: 100%; height: 12px; background: #222; border-radius: 10px; margin: 10px 0; border: 1px solid var(--n-red); }
-        .hp-inner { height: 100%; background: var(--n-red); width: 100%; transition: 0.4s; box-shadow: 0 0 10px var(--n-red); }
 
-        /* MEAL CARDS */
-        .meal-item {
-            background: rgba(255,255,255,0.03); border-left: 3px solid var(--n-green);
-            padding: 10px; margin-bottom: 10px; border-radius: 5px;
+        /* MEAL HUB */
+        .meal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .card { 
+            background: rgba(255,255,255,0.05); padding: 12px; border-radius: 15px; 
+            border: 1px solid rgba(255,255,255,0.1); transition: 0.3s;
         }
-        .meal-tag { font-size: 0.6rem; color: var(--n-green); border: 1px solid var(--n-green); padding: 2px 5px; border-radius: 3px; }
-
-        /* SHARD STORE & POWERUPS */
-        .store-grid { display: grid; gap: 10px; }
-        .item {
-            background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px;
-            display: flex; justify-content: space-between; align-items: center; border: 1px solid transparent;
-        }
-        .item:hover { border-color: var(--n-blue); background: rgba(0,210,255,0.1); }
-        .perm-up { border-color: var(--n-gold); }
+        .card:hover { border-color: var(--main-theme); transform: translateY(-3px); }
 
         /* BUTTONS */
         button {
-            background: var(--n-blue); border: none; color: #000; padding: 8px 15px;
-            font-family: 'Orbitron'; font-weight: bold; cursor: pointer; border-radius: 5px;
+            background: var(--main-theme); border: none; color: #000; padding: 10px;
+            font-family: 'Orbitron'; font-weight: 900; cursor: pointer; border-radius: 8px; width: 100%;
         }
-        button:hover { filter: brightness(1.2); transform: translateY(-2px); }
+        button:hover { filter: brightness(1.2); box-shadow: 0 0 15px var(--main-theme); }
 
-        /* FOOTER HUD */
-        footer { grid-column: 1 / 4; display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
-        .hud-stat { text-align: center; border-right: 1px solid rgba(255,255,255,0.1); }
-        .hud-stat:last-child { border: none; }
-
-        /* 80 FEATURE LIST MINI-ICONS */
-        .feature-stream { display: flex; flex-wrap: wrap; gap: 5px; opacity: 0.6; }
-        .feat-tag { font-size: 0.65rem; background: #111; padding: 3px 6px; border-radius: 10px; }
-
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: var(--n-blue); }
+        .locked { opacity: 0.3; filter: grayscale(1); cursor: not-allowed; pointer-events: none; }
     </style>
 </head>
 <body>
 
-<div class="nebula"></div>
+<div class="dots" id="bg-dots"></div>
+<div class="drippy-glow"></div>
 
-<div class="os-container">
-    <header class="panel">
-        <div class="logo">ZENITH OS v3.0 // SINGULARITY</div>
-        <div style="color: var(--n-gold);">PREMIUM OVERLORD ACCOUNT ACTIVE</div>
-        <div>SERVER TIME: <span id="time">12:25:53</span></div>
+<div id="ascension-overlay">
+    <h1 style="font-family:'Orbitron'; color:var(--n-gold); font-size: 4rem;">LEVEL UP</h1>
+    <h2 id="drill-name" style="color:var(--n-red);">30 SECONDS: BURPEES</h2>
+    <div id="timer" style="font-size: 8rem; color:var(--main-theme);">30</div>
+</div>
+
+<div class="os-grid">
+    <header class="panel" style="grid-column: 1/4; display: flex; justify-content: space-between; align-items: center;">
+        <div style="font-family:'Orbitron'; font-size: 2rem; color: var(--main-theme); text-shadow: 0 0 10px var(--main-theme);">ZENITH SINGULARITY</div>
+        <div style="font-size: 1.8rem; color: var(--n-gold);">🪙 <span id="coin-val">5000</span></div>
     </header>
 
     <aside class="panel">
-        <h2>Character Profile</h2>
-        <div style="background: rgba(0,210,255,0.1); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
-            <div style="display:flex; justify-content:space-between;">
-                <span>LVL: <b id="lvl">1</b></span>
-                <span>XP: <b id="xp">0/1000</b></span>
+        <div style="text-align: center; border: 2px solid var(--n-red); padding: 15px; border-radius: 20px; margin-bottom: 15px;">
+            <h2 style="margin:0;">LVL: <span id="lvl">1</span></h2>
+            <div style="background: #222; height: 10px; border-radius: 5px; margin: 10px 0;">
+                <div id="xp-fill" style="background: var(--main-theme); height: 100%; width: 0%;"></div>
             </div>
-            <div class="hp-outer" style="border-color: var(--n-blue);"><div id="xp-fill" class="hp-inner" style="background: var(--n-blue); width: 0%;"></div></div>
+            <button onclick="gainXP(250)">TRAIN (+250 XP)</button>
         </div>
 
-        <div class="boss-card">
-            <h3 style="margin:0; color:var(--n-red);">RAID: WORLD EATER</h3>
-            <div class="hp-outer"><div id="boss-hp" class="hp-inner"></div></div>
-            <button onclick="battle()" style="background: var(--n-red); width: 100%;">STRIKE (100 STEPS)</button>
+        <h3 style="color: var(--n-red);">BOSS: VOID TITAN</h3>
+        <div style="background: #222; height: 10px; border-radius: 5px; margin-bottom: 10px;">
+            <div id="boss-hp" style="background: var(--n-red); height: 100%; width: 100%;"></div>
         </div>
+        <button onclick="attackBoss()" style="background: var(--n-red);">STRIKE BOSS</button>
 
-        <hr style="opacity:0.1; margin:20px 0;">
-        <h2>Skill Tree</h2>
-        <div class="feature-stream" id="skills">
-            </div>
+        <hr style="opacity:0.1; margin: 20px 0;">
+        
+        <h3>🎨 OS CUSTOMIZATION</h3>
+        <div id="custom-panel">
+            <div class="card locked" id="c5">LVL 5: <input type="color" onchange="changeTheme(this.value)"></div>
+            <div class="card locked" id="c10">LVL 10: <input type="range" min="0" max="25" oninput="changeDrip(this.value)"></div>
+            <div class="card locked" id="c15">LVL 15: <button onclick="changeShape('0px')">SQUARE MODE</button></div>
+        </div>
     </aside>
 
     <main class="panel">
-        <div style="text-align: center; margin-bottom: 20px;">
-            <h1 style="margin:0; font-size: 3rem; color: var(--n-blue);">💎 <span id="shard-val">10000</span></h1>
-            <small>RESERVE SHARDS AVAILABLE</small>
+        <div style="display: flex; gap: 5px; margin-bottom: 15px;">
+            <button onclick="renderMeals('Breakfast')">Breakfast</button>
+            <button onclick="renderMeals('Lunch')">Lunch</button>
+            <button onclick="renderMeals('Dinner')">Dinner</button>
+            <button onclick="renderMeals('Diet')">Diet</button>
         </div>
-
-        <h2>Alchemist's Kitchen</h2>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <div class="meal-item"><span class="meal-tag">Breakfast</span><br><b>Nebula Oats</b><br><small>+5 Stamina Boost</small></div>
-            <div class="meal-item"><span class="meal-tag">Lunch</span><br><b>Cyber Salmon Bowl</b><br><small>+10 Muscle Recovery</small></div>
-            <div class="meal-item"><span class="meal-tag">Dinner</span><br><b>Gladiator Steak</b><br><small>+15 Strength Gain</small></div>
-            <div class="meal-item"><span class="meal-tag">Diet</span><br><b>Keto Protocol</b><br><small>+2x Fat Oxidation</small></div>
-        </div>
-
-        <hr style="opacity:0.1; margin:20px 0;">
-        <h2>Active OS Features (80/80 Locked-In)</h2>
-        <div class="feature-stream" id="feat-list"></div>
+        <h2 id="cat-title">120-MEAL ENGINE</h2>
+        <div id="meal-list" class="meal-grid"></div>
+        
+        <hr style="opacity:0.1; margin: 20px 0;">
+        <h3>SYSTEM OVERVIEW (80 FEATURES ACTIVE)</h3>
+        <div id="feat-cloud" style="display:flex; flex-wrap:wrap; gap:5px; font-size:0.6rem; opacity:0.4;"></div>
     </main>
 
     <aside class="panel">
-        <h2 style="color: var(--n-blue);">Shard Store</h2>
-        <div class="store-grid" id="store">
-            </div>
-
-        <h2 style="color: var(--n-gold); margin-top:20px;">Permanent Power-Ups</h2>
-        <div class="store-grid" id="perm-store">
-            </div>
+        <h3>PERMANENT VAULT</h3>
+        <div id="power-ups"></div>
+        <hr style="opacity:0.1; margin: 20px 0;">
+        <h3>📜 DRILL HISTORY</h3>
+        <div id="history-log" style="font-size:0.8rem;"></div>
     </aside>
 
-    <footer class="panel">
-        <div class="hud-stat"><h3>STRENGTH</h3><h2 id="str">10</h2></div>
-        <div class="hud-stat"><h3>STAMINA</h3><h2 id="sta">10</h2></div>
-        <div class="hud-stat"><h3>ECO-SCORE</h3><h2>145<small>kg</small></h2></div>
-        <div class="hud-stat"><h3>HEART RATE</h3><h2 style="color: var(--n-red);">72 <small>BPM</small></h2></div>
+    <footer class="panel" style="grid-column: 1/4; display: flex; justify-content: space-around; align-items: center;">
+        <div>STR: <b id="str">10</b></div>
+        <div>STA: <b id="sta">10</b></div>
+        <div>AGI: <b id="agi">10</b></div>
+        <div style="color: var(--n-green);">OS STATUS: ENHANCED</div>
     </footer>
 </div>
 
 <script>
-    const data = {
-        shards: 10000, lvl: 1, xp: 0, str: 10, sta: 10, bossHP: 1000
-    };
-
-    const features = ["AI Form Guard", "Ghost Runner", "Bio-Readiness", "Eco-Impact", "Fitness Raids", "Meal AI", "Circadian Sync", "Posture Pulse", "Hydration Pings", "NPC Coaches", "Skill Trees", "World Conquest", "Lactic Warning", "V02 Max", "Grip Strength", "Cold Plunge", "Macro Chef", "Seasonal Pass", "NFT Gear", "Gym Buddy Finder"];
-
-    const store = [
-        { name: "Streak Shield", cost: 500, type: 'regular' },
-        { name: "Mythic Skin", cost: 2000, type: 'regular' },
-        { name: "Titan Bone Weave", cost: 5000, bonus: "+20 STR", type: 'perm', stat: 'str', val: 20 },
-        { name: "O2 Lung Nanobots", cost: 8000, bonus: "+25 STA", type: 'perm', stat: 'sta', val: 25 }
-    ];
-
-    function init() {
-        renderAll();
-        updateUI();
-        setInterval(() => { document.getElementById('time').innerText = new Date().toLocaleTimeString(); }, 1000);
-    }
+    let state = { coins: 5000, xp: 0, lvl: 1, str: 10, sta: 10, agi: 10, bossHP: 1000, history: [] };
+    const drills = ["Burpees", "Plank", "Mountain Climbers", "Jump Squats", "High Knees"];
+    
+    // Meal Data Generation
+    const mealDB = {};
+    ['Breakfast', 'Lunch', 'Dinner', 'Diet'].forEach(cat => {
+        mealDB[cat] = Array.from({length: 30}, (_, i) => ({ name: `${cat} Module ${i+1}`, cost: (i+1) * 150 }));
+    });
 
     function updateUI() {
-        document.getElementById('shard-val').innerText = data.shards.toLocaleString();
-        document.getElementById('str').innerText = data.str;
-        document.getElementById('sta').innerText = data.sta;
-        document.getElementById('lvl').innerText = data.lvl;
-        document.getElementById('boss-hp').style.width = (data.bossHP / 10).toFixed(0) + "%";
-        document.getElementById('xp-fill').style.width = (data.xp / 10) + "%";
+        document.getElementById('coin-val').innerText = state.coins.toLocaleString();
+        document.getElementById('lvl').innerText = state.lvl;
+        document.getElementById('str').innerText = state.str;
+        document.getElementById('sta').innerText = state.sta;
+        document.getElementById('agi').innerText = state.agi;
+        document.getElementById('xp-fill').style.width = (state.xp / 10) + "%";
+        document.getElementById('boss-hp').style.width = (state.bossHP / 10) + "%";
+        
+        // Customization Unlocks
+        if(state.lvl >= 5) document.getElementById('c5').classList.remove('locked');
+        if(state.lvl >= 10) document.getElementById('c10').classList.remove('locked');
+        if(state.lvl >= 15) document.getElementById('c15').classList.remove('locked');
+
+        renderMeals(currentCat);
     }
 
-    function renderAll() {
-        // Render 80 Features
-        const fList = document.getElementById('feat-list');
-        features.forEach(f => fList.innerHTML += `<span class="feat-tag">◈ ${f}</span>`);
-        
-        // Render Stores
-        const sDiv = document.getElementById('store');
-        const pDiv = document.getElementById('perm-store');
-        store.forEach(item => {
-            const html = `<div class="item ${item.type === 'perm' ? 'perm-up' : ''}">
-                <div><b>${item.name}</b><br><small>${item.bonus || 'Consumable'}</small></div>
-                <button onclick="buy('${item.name}', ${item.cost}, '${item.type}', '${item.stat}', ${item.val})">💎 ${item.cost}</button>
-            </div>`;
-            item.type === 'perm' ? pDiv.innerHTML += html : sDiv.innerHTML += html;
+    let currentCat = 'Breakfast';
+    function renderMeals(cat) {
+        currentCat = cat;
+        const list = document.getElementById('meal-list');
+        list.innerHTML = "";
+        mealDB[cat].filter(m => m.cost <= state.coins).forEach(m => {
+            list.innerHTML += `<div class="card"><b>${m.name}</b><br>🪙 ${m.cost}</div>`;
         });
     }
 
-    function buy(name, cost, type, stat, val) {
-        if (data.shards >= cost) {
-            data.shards -= cost;
-            if (type === 'perm') data[stat] += val;
-            alert(`ACQUIRED: ${name}`);
-            updateUI();
-        } else alert("SHARDS INSUFFICIENT.");
+    function gainXP(amt) {
+        state.xp += amt;
+        if (state.xp >= 1000) levelUp();
+        updateUI();
     }
 
-    function battle() {
-        const dmg = data.str * 1.5;
-        data.bossHP = Math.max(0, data.bossHP - dmg);
-        data.xp += 50;
-        data.shards += 200;
-        if (data.bossHP <= 0) {
-            alert("TITAN SLAYER! Level Up + Rare Loot!");
-            data.bossHP = 1000; data.lvl++; data.xp = 0;
-        }
+    function levelUp() {
+        state.xp = 0; state.lvl++;
+        state.coins += (state.lvl * 1000);
+        const drill = drills[Math.floor(Math.random()*drills.length)];
+        const overlay = document.getElementById('ascension-overlay');
+        document.getElementById('drill-name').innerText = `30 SECONDS: ${drill.toUpperCase()}`;
+        overlay.style.display = 'flex';
+
+        let t = 30;
+        const int = setInterval(() => {
+            t--;
+            document.getElementById('timer').innerText = t;
+            if(t <= 0) {
+                clearInterval(int);
+                overlay.style.display = 'none';
+                state.history.unshift(`${new Date().toLocaleTimeString()}: ${drill}`);
+                document.getElementById('history-log').innerHTML = state.history.slice(0,5).map(h => `<div>◈ ${h}</div>`).join("");
+                updateUI();
+            }
+        }, 1000);
+    }
+
+    function attackBoss() {
+        state.bossHP = Math.max(0, state.bossHP - (state.str * 2));
+        state.coins += 100;
+        if(state.bossHP <= 0) { alert("TITAN DEFEATED! +5000 COINS"); state.coins += 5000; state.bossHP = 1000; }
         updateUI();
+    }
+
+    function changeTheme(c) { document.documentElement.style.setProperty('--main-theme', c); }
+    function changeDrip(v) { document.documentElement.style.setProperty('--drip-blur', v + 'px'); }
+    function changeShape(s) { document.getElementById('bg-dots').style.borderRadius = s; }
+
+    function init() {
+        const cloud = document.getElementById('feat-cloud');
+        for(let i=1; i<=80; i++) cloud.innerHTML += `<span>F_${i} </span>`;
+        
+        const vault = document.getElementById('power-ups');
+        const upgrades = [{n: "Strength Core", s: "str"}, {n: "Stamina Core", s: "sta"}, {n: "Agility Core", s: "agi"}];
+        upgrades.forEach(u => {
+            vault.innerHTML += `<div class="card">${u.n}<br><button onclick="buy('${u.s}')">🪙 5000</button></div>`;
+        });
+        updateUI();
+    }
+
+    function buy(s) {
+        if(state.coins >= 5000) { state.coins -= 5000; state[s] += 10; updateUI(); }
+        else alert("COINS REQUIRED.");
     }
 
     init();
