@@ -10,12 +10,27 @@
             --n-blue: #00d2ff; --n-purp: #9d50bb; --n-green: #39ff14; --n-red: #ff3131; --n-gold: #ffcf10;
             --main-theme: var(--n-blue);
             --drip-blur: 8px;
+            --panel-radius: 25px;
         }
 
         body, html {
             margin: 0; padding: 0; height: 100%; width: 100%;
             background: #000; color: #fff; font-family: 'Rajdhani', sans-serif;
-            overflow: hidden;
+            overflow: hidden; transition: background 1s ease;
+        }
+
+        /* PREMIUM GOLDEN MODE */
+        .premium-mode {
+            --main-theme: #ffcf10 !important;
+            background: radial-gradient(circle at center, #1a1500 0%, #000 100%) !important;
+        }
+        .premium-mode .panel {
+            border-color: rgba(255, 207, 16, 0.4) !important;
+            box-shadow: 0 0 30px rgba(255, 207, 16, 0.15);
+        }
+        .premium-mode button {
+            background: linear-gradient(45deg, #ffcf10, #b8860b) !important;
+            color: #000 !important;
         }
 
         /* DYNAMIC COSMOS BACKGROUND */
@@ -44,8 +59,9 @@
 
         .panel {
             background: rgba(0, 0, 0, 0.88); backdrop-filter: blur(30px);
-            border: 2px solid rgba(255, 255, 255, 0.12); border-radius: 25px; 
+            border: 2px solid rgba(255, 255, 255, 0.12); border-radius: var(--panel-radius); 
             padding: 20px; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            transition: 0.5s ease;
         }
 
         /* LEVEL UP OVERLAY */
@@ -70,7 +86,7 @@
         }
         button:hover { filter: brightness(1.2); box-shadow: 0 0 15px var(--main-theme); }
 
-        .locked { opacity: 0.3; filter: grayscale(1); cursor: not-allowed; pointer-events: none; }
+        .locked { opacity: 0.2; filter: grayscale(1); cursor: not-allowed; pointer-events: none; }
     </style>
 </head>
 <body>
@@ -86,7 +102,10 @@
 
 <div class="os-grid">
     <header class="panel" style="grid-column: 1/4; display: flex; justify-content: space-between; align-items: center;">
-        <div style="font-family:'Orbitron'; font-size: 2rem; color: var(--main-theme); text-shadow: 0 0 10px var(--main-theme);">ZENITH SINGULARITY</div>
+        <div>
+            <div style="font-family:'Orbitron'; font-size: 2rem; color: var(--main-theme); text-shadow: 0 0 10px var(--main-theme);">ZENITH SINGULARITY</div>
+            <div id="streak-info" style="color: var(--n-gold); font-size: 0.8rem; font-weight: bold;"></div>
+        </div>
         <div style="font-size: 1.8rem; color: var(--n-gold);">🪙 <span id="coin-val">5000</span></div>
     </header>
 
@@ -103,15 +122,15 @@
         <div style="background: #222; height: 10px; border-radius: 5px; margin-bottom: 10px;">
             <div id="boss-hp" style="background: var(--n-red); height: 100%; width: 100%;"></div>
         </div>
-        <button onclick="attackBoss()" style="background: var(--n-red);">STRIKE BOSS</button>
+        <button onclick="attackBoss()" style="background: var(--n-red); color: white;">STRIKE BOSS</button>
 
         <hr style="opacity:0.1; margin: 20px 0;">
         
         <h3>🎨 OS CUSTOMIZATION</h3>
         <div id="custom-panel">
-            <div class="card locked" id="c5">LVL 5: <input type="color" onchange="changeTheme(this.value)"></div>
-            <div class="card locked" id="c10">LVL 10: <input type="range" min="0" max="25" oninput="changeDrip(this.value)"></div>
-            <div class="card locked" id="c15">LVL 15: <button onclick="changeShape('0px')">SQUARE MODE</button></div>
+            <div class="card locked" id="c5">LVL 5: <input type="color" onchange="changeTheme(this.value)" style="width:100%"></div>
+            <div class="card locked" id="c10">LVL 10: <input type="range" min="0" max="25" oninput="changeDrip(this.value)" style="width:100%"></div>
+            <div class="card locked" id="c15">LVL 15: <button onclick="toggleShape()">SQUARE MODE</button></div>
         </div>
     </aside>
 
@@ -126,7 +145,7 @@
         <div id="meal-list" class="meal-grid"></div>
         
         <hr style="opacity:0.1; margin: 20px 0;">
-        <h3>SYSTEM OVERVIEW (80 FEATURES ACTIVE)</h3>
+        <h3>SYSTEM OVERVIEW (<span id="feat-count">80</span> FEATURES ACTIVE)</h3>
         <div id="feat-cloud" style="display:flex; flex-wrap:wrap; gap:5px; font-size:0.6rem; opacity:0.4;"></div>
     </main>
 
@@ -143,18 +162,40 @@
         <div>STA: <b id="sta">10</b></div>
         <div>AGI: <b id="agi">10</b></div>
         <div style="color: var(--n-green);">OS STATUS: ENHANCED</div>
+        <button onclick="hardReset()" style="width:auto; background:transparent; border:1px solid red; color:red; font-size:0.7rem;">RESET OS</button>
     </footer>
 </div>
 
 <script>
-    let state = { coins: 5000, xp: 0, lvl: 1, str: 10, sta: 10, agi: 10, bossHP: 1000, history: [] };
+    let defaultState = { 
+        coins: 5000, xp: 0, lvl: 1, 
+        str: 10, sta: 10, agi: 10, 
+        bossHP: 1000, history: [],
+        lastLogin: null, streak: 1, isSquare: false 
+    };
+
+    let state = JSON.parse(localStorage.getItem('zenith_save')) || defaultState;
     const drills = ["Burpees", "Plank", "Mountain Climbers", "Jump Squats", "High Knees"];
-    
-    // Meal Data Generation
+    let currentCat = 'Breakfast';
+
+    // Meal Data Generation (30 per category = 120 total)
     const mealDB = {};
     ['Breakfast', 'Lunch', 'Dinner', 'Diet'].forEach(cat => {
         mealDB[cat] = Array.from({length: 30}, (_, i) => ({ name: `${cat} Module ${i+1}`, cost: (i+1) * 150 }));
     });
+
+    function saveGame() { localStorage.setItem('zenith_save', JSON.stringify(state)); }
+
+    function checkStreak() {
+        const now = new Date();
+        if (state.lastLogin) {
+            const last = new Date(state.lastLogin);
+            const diffInDays = (now - last) / (1000 * 60 * 60 * 24);
+            if (diffInDays > 1 && diffInDays < 2) state.streak++;
+            else if (diffInDays >= 2) state.streak = 1;
+        }
+        state.lastLogin = now.getTime();
+    }
 
     function updateUI() {
         document.getElementById('coin-val').innerText = state.coins.toLocaleString();
@@ -163,17 +204,41 @@
         document.getElementById('sta').innerText = state.sta;
         document.getElementById('agi').innerText = state.agi;
         document.getElementById('xp-fill').style.width = (state.xp / 10) + "%";
-        document.getElementById('boss-hp').style.width = (state.bossHP / 10) + "%";
         
-        // Customization Unlocks
+        let bossMax = 1000 + (state.lvl * 200); 
+        document.getElementById('boss-hp').style.width = (state.bossHP / (bossMax/100)) + "%";
+        
+        const mult = (1 + (state.streak * 0.1)).toFixed(1);
+        document.getElementById('streak-info').innerText = `🔥 STREAK: ${state.streak}D (XP Multiplier: ${mult}x)`;
+
         if(state.lvl >= 5) document.getElementById('c5').classList.remove('locked');
         if(state.lvl >= 10) document.getElementById('c10').classList.remove('locked');
-        if(state.lvl >= 15) document.getElementById('c15').classList.remove('locked');
+        
+        if(state.lvl >= 15) {
+            document.getElementById('c15').classList.remove('locked');
+            document.body.classList.add('premium-mode');
+            renderFeatureCloud(95);
+            document.getElementById('feat-count').innerText = "95";
+        } else {
+            document.body.classList.remove('premium-mode');
+            renderFeatureCloud(80);
+            document.getElementById('feat-count').innerText = "80";
+        }
 
         renderMeals(currentCat);
+        document.getElementById('history-log').innerHTML = state.history.slice(0,5).map(h => `<div>◈ ${h}</div>`).join("");
+        saveGame();
     }
 
-    let currentCat = 'Breakfast';
+    function renderFeatureCloud(count) {
+        const cloud = document.getElementById('feat-cloud');
+        cloud.innerHTML = "";
+        for(let i=1; i<=count; i++) {
+            let prefix = i > 80 ? "PREM_" : "F_";
+            cloud.innerHTML += `<span>${prefix}${i} </span>`;
+        }
+    }
+
     function renderMeals(cat) {
         currentCat = cat;
         const list = document.getElementById('meal-list');
@@ -184,13 +249,14 @@
     }
 
     function gainXP(amt) {
-        state.xp += amt;
-        if (state.xp >= 1000) levelUp();
+        const multiplier = 1 + (state.streak * 0.1);
+        state.xp += (amt * multiplier);
+        while (state.xp >= 1000) { state.xp -= 1000; levelUp(); }
         updateUI();
     }
 
     function levelUp() {
-        state.xp = 0; state.lvl++;
+        state.lvl++;
         state.coins += (state.lvl * 1000);
         const drill = drills[Math.floor(Math.random()*drills.length)];
         const overlay = document.getElementById('ascension-overlay');
@@ -198,14 +264,13 @@
         overlay.style.display = 'flex';
 
         let t = 30;
-        const int = setInterval(() => {
+        const interval = setInterval(() => {
             t--;
             document.getElementById('timer').innerText = t;
             if(t <= 0) {
-                clearInterval(int);
+                clearInterval(interval);
                 overlay.style.display = 'none';
                 state.history.unshift(`${new Date().toLocaleTimeString()}: ${drill}`);
-                document.getElementById('history-log').innerHTML = state.history.slice(0,5).map(h => `<div>◈ ${h}</div>`).join("");
                 updateUI();
             }
         }, 1000);
@@ -214,29 +279,38 @@
     function attackBoss() {
         state.bossHP = Math.max(0, state.bossHP - (state.str * 2));
         state.coins += 100;
-        if(state.bossHP <= 0) { alert("TITAN DEFEATED! +5000 COINS"); state.coins += 5000; state.bossHP = 1000; }
+        if(state.bossHP <= 0) { 
+            alert("TITAN DEFEATED!"); 
+            state.coins += 5000; 
+            state.bossHP = 1000 + (state.lvl * 200); 
+        }
         updateUI();
     }
 
     function changeTheme(c) { document.documentElement.style.setProperty('--main-theme', c); }
     function changeDrip(v) { document.documentElement.style.setProperty('--drip-blur', v + 'px'); }
-    function changeShape(s) { document.getElementById('bg-dots').style.borderRadius = s; }
+    function toggleShape() {
+        state.isSquare = !state.isSquare;
+        document.documentElement.style.setProperty('--panel-radius', state.isSquare ? "0px" : "25px");
+    }
+
+    function buy(s) {
+        if(state.coins >= 5000) { state.coins -= 5000; state[s] += 10; updateUI(); }
+        else alert("5,000 COINS REQUIRED.");
+    }
+
+    function hardReset() {
+        if(confirm("WIPE SYSTEM DATA?")) { localStorage.clear(); location.reload(); }
+    }
 
     function init() {
-        const cloud = document.getElementById('feat-cloud');
-        for(let i=1; i<=80; i++) cloud.innerHTML += `<span>F_${i} </span>`;
-        
+        checkStreak();
         const vault = document.getElementById('power-ups');
         const upgrades = [{n: "Strength Core", s: "str"}, {n: "Stamina Core", s: "sta"}, {n: "Agility Core", s: "agi"}];
         upgrades.forEach(u => {
             vault.innerHTML += `<div class="card">${u.n}<br><button onclick="buy('${u.s}')">🪙 5000</button></div>`;
         });
         updateUI();
-    }
-
-    function buy(s) {
-        if(state.coins >= 5000) { state.coins -= 5000; state[s] += 10; updateUI(); }
-        else alert("COINS REQUIRED.");
     }
 
     init();
